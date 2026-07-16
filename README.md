@@ -22,6 +22,15 @@ analysis locally.
   <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/trychatsights.com-181818?style=for-the-badge&logoColor=white" alt="trychatsights.com"></a>
 </p>
 
+<p>
+  <b>English</b> ·
+  <a href="./README.zh-CN.md">简体中文</a> ·
+  <a href="./README.ja.md">日本語</a> ·
+  <a href="./README.ko.md">한국어</a> ·
+  <a href="./README.es.md">Español</a> ·
+  <a href="./README.fr.md">Français</a>
+</p>
+
 ⭐ <em>If these skills help you show up in AI answers, a GitHub Star would mean a lot.</em>
 
 </div>
@@ -127,6 +136,10 @@ sequenceDiagram
 If you find these skills useful, a GitHub Star ⭐️ helps other builders find them.
 
 ## Quickstart
+
+> 📖 Full step-by-step setup per client (Claude Code / Cursor / Codex) and an end-to-end
+> walkthrough: **[Installation Guide](./docs/installation.md)** ·
+> **[Usage Guide](./docs/usage.md)**
 
 ### Prerequisite — connect the ChatSights MCP
 
