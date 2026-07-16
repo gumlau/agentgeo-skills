@@ -1,0 +1,15 @@
+# OS / editor
+.DS_Store
+*.log
+
+# Node
+node_modules/
+npm-debug.log*
+
+# Secrets / local config — never commit
+.env
+.env.*
+!.env.example
+
+# Agent scratch — enable-skills.sh writes symlinks here
+.claude/skills/

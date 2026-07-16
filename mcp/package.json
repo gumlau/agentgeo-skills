@@ -1,0 +1,39 @@
+{
+  "name": "chatsights-mcp",
+  "version": "0.1.0",
+  "description": "Local MCP server for ChatSights — one narrow tool, fetch_raw_answers, that pulls raw AI answers, citations and sources across six surfaces (ChatGPT, Perplexity, Gemini, Google AI Overview, Google AI Mode, Copilot). No ranking, no scoring; analysis stays in your agent.",
+  "type": "module",
+  "bin": {
+    "chatsights-mcp": "./index.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "README.md"
+  ],
+  "scripts": {
+    "check": "node --check index.mjs"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "geo",
+    "generative-engine-optimization",
+    "ai-search",
+    "chatgpt",
+    "perplexity",
+    "gemini",
+    "chatsights"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "homepage": "https://trychatsights.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gumlau/chatsights-geo-skills.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
