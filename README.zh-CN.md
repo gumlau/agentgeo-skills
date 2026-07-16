@@ -141,7 +141,11 @@ sequenceDiagram
 ### 前置 —— 连接 ChatSights MCP
 
 ```bash
-# 直接运行本仓库的 MCP —— 现在就能用(绝对路径)
+# 用本仓库的 MCP 连接托管 API —— 现在就能用(绝对路径)
+claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+  --api-url https://api.trychatsights.com
+
+# …本地开发替代方案:连接你自己跑的本地 API
 claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 
@@ -150,7 +154,8 @@ claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychat
 ```
 
 在没有 provider 凭证时,ChatSights 会返回带标注的**演示数据(demo fixtures),零 credit 消耗**,
-让你在花钱之前先把每个 skill 跑通。到 [trychatsights.com](https://trychatsights.com) 获取 API key。
+让你在花钱之前先把每个 skill 跑通。到 [trychatsights.com](https://trychatsights.com) 获取 API key,
+并在 [app.trychatsights.com](https://app.trychatsights.com) 的控制台里管理它们。
 
 ### 启用这些 skill
 

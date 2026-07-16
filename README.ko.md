@@ -142,7 +142,11 @@ sequenceDiagram
 ### 사전 준비 — ChatSights MCP 연결
 
 ```bash
-# Run this repo's MCP directly — works today (absolute path)
+# Connect this repo's MCP to the hosted API — works today (absolute path)
+claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+  --api-url https://api.trychatsights.com
+
+# …or for local development, point at a locally running API instead
 claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 

@@ -144,7 +144,11 @@ If you find these skills useful, a GitHub Star ⭐️ helps other builders find 
 ### Prerequisite — connect the ChatSights MCP
 
 ```bash
-# Run this repo's MCP directly — works today (absolute path)
+# Run this repo's MCP against the hosted API — works today (absolute path)
+claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+  --api-url https://api.trychatsights.com
+
+# …or point it at a local dev server (local development alternative)
 claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 
@@ -154,7 +158,8 @@ claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychat
 
 Without provider credentials, ChatSights returns labelled **demo fixtures at zero credits**,
 so you can dry-run every skill before spending. Get an API key at
-[trychatsights.com](https://trychatsights.com).
+[trychatsights.com](https://trychatsights.com), and manage runs from the console at
+[app.trychatsights.com](https://app.trychatsights.com).
 
 ### Enable the skills
 

@@ -146,7 +146,11 @@ Si ces skills vous sont utiles, une étoile GitHub ⭐️ aide d'autres créateu
 ### Prérequis — connecter le MCP ChatSights
 
 ```bash
-# Run this repo's MCP directly — works today (absolute path)
+# Run this repo's MCP directly against the hosted API — works today (absolute path)
+claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+  --api-url https://api.trychatsights.com
+
+# …or point it at a local development server instead
 claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 

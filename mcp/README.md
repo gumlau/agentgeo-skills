@@ -9,17 +9,21 @@ voice, confidence, or conclusions.
 
 ## Setup
 
-Register the server with your agent. Once published to npm you can run it with
-`npx`; until then, point at this file with an absolute path so the client can
-start it from any working directory:
+Register the server with your agent. Point at this file with an absolute path so
+the client can start it from any working directory, targeting the hosted API
+(works today):
 
 ```bash
-# From npm (once published)
-claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychatsights.com
+# Run this file directly against the hosted API
+claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+  --api-url https://api.trychatsights.com
 
-# …or run this file directly
+# …or, for local development, target your own API
 claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
+
+# From npm (coming soon — package not published yet)
+claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychatsights.com
 ```
 
 If API key authentication is enabled, append `--key cs_live_...` or set

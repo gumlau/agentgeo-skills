@@ -52,9 +52,18 @@ stripped automatically.
 
 ### Claude Code
 
-Run this repo's MCP directly with an absolute path (works today):
+Run this repo's MCP directly with an absolute path, pointed at the **hosted API**
+(works today):
 
 ```bash
+claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+  --api-url https://api.trychatsights.com
+```
+
+For **local development** against your own API, point `--api-url` at localhost instead:
+
+```bash
+# local-dev alternative
 claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 ```
@@ -74,8 +83,8 @@ claude mcp list                # chatsights should appear
 
 ### Cursor
 
-Add a `chatsights` entry to your MCP config. Project-scoped lives at
-`.cursor/mcp.json`; global lives at `~/.cursor/mcp.json`.
+Add a `chatsights` entry to your MCP config, pointed at the **hosted API**.
+Project-scoped lives at `.cursor/mcp.json`; global lives at `~/.cursor/mcp.json`.
 
 ```json
 {
@@ -85,12 +94,14 @@ Add a `chatsights` entry to your MCP config. Project-scoped lives at
       "args": [
         "/absolute/path/to/chatsights-geo-skills/mcp/index.mjs",
         "--api-url",
-        "http://localhost:8080"
+        "https://api.trychatsights.com"
       ]
     }
   }
 }
 ```
+
+For **local development**, swap the URL for `http://localhost:8080`.
 
 To use a live key, add an `env` block instead of putting the secret on the command
 line:
@@ -114,11 +125,14 @@ Restart Cursor (or reload the MCP server) after editing the file.
 
 ### Codex / generic stdio MCP clients
 
-Any MCP client that launches a stdio server works. The generic command is:
+Any MCP client that launches a stdio server works. The generic command points at the
+**hosted API**:
 
 ```bash
-node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs --api-url http://localhost:8080
+node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs --api-url https://api.trychatsights.com
 ```
+
+For **local development**, use `--api-url http://localhost:8080` instead.
 
 Wire that into your client's server config. Codex's `~/.codex/config.toml`, for
 example:
@@ -164,7 +178,7 @@ before you spend anything.
 ```bash
 # Demo mode — no key, zero credits
 claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
-  --api-url http://localhost:8080
+  --api-url https://api.trychatsights.com
 ```
 
 ### Live mode
