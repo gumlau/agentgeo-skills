@@ -11,7 +11,8 @@
     "README.md"
   ],
   "scripts": {
-    "check": "node --check index.mjs"
+    "check": "node --check index.mjs",
+    "prepublishOnly": "node --check index.mjs"
   },
   "keywords": [
     "mcp",

@@ -1,0 +1,34 @@
+name: Publish chatsights-mcp
+
+# Publishes mcp/ to npm when a GitHub Release is published, or on manual dispatch.
+# Requires an NPM_TOKEN repo secret (npm "Automation" token). See RELEASING.md.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # enables npm provenance
+    defaults:
+      run:
+        working-directory: mcp
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+
+      - name: Syntax check
+        run: node --check index.mjs
+
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
