@@ -1,12 +1,12 @@
-# Releasing `chatsights-mcp`
+# Releasing `agentgeo-mcp`
 
 The npm package lives in [`mcp/`](./mcp). Once published, users install it with:
 
 ```bash
-claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
 ```
 
-The package name `chatsights-mcp` is available on npm, and `mcp/package.json` is
+The package name `agentgeo-mcp` is available on npm, and `mcp/package.json` is
 already publish-ready (public access, `bin`, `files`, provenance-friendly
 `repository`). The tarball ships exactly three files: `index.mjs`, `README.md`,
 `package.json` (~3 kB).
@@ -16,7 +16,7 @@ already publish-ready (public access, `bin`, `files`, provenance-friendly
 The GitHub Actions workflow publishes with a token, so no local `npm login` is needed.
 
 1. On [npmjs.com](https://www.npmjs.com/) → **Access Tokens** → **Generate New Token**
-   → choose **Automation** (or a Granular token scoped to publish `chatsights-mcp`).
+   → choose **Automation** (or a Granular token scoped to publish `agentgeo-mcp`).
 2. In this repo: **Settings → Secrets and variables → Actions → New repository secret**
    - Name: `NPM_TOKEN`
    - Value: the token from step 1
@@ -38,8 +38,8 @@ The GitHub Actions workflow publishes with a token, so no local `npm login` is n
 4. Confirm it landed:
 
    ```bash
-   npm view chatsights-mcp version
-   npx -y chatsights-mcp --api-url http://localhost:8080   # smoke test
+   npm view agentgeo-mcp version
+   npx -y agentgeo-mcp --api-url http://localhost:8080   # smoke test
    ```
 
 You can also run the workflow by hand from the **Actions** tab (**Run workflow**).

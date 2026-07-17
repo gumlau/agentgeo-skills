@@ -1,9 +1,9 @@
-# ChatSights GEO Skills
+# AgentGEO GEO Skills
 
 **Turn raw AI answers into GEO decisions — on the agent side.**
 
 A suite of eight [Agent Skills](https://agentskills.io) that run inside Claude Code, Cursor,
-Codex, or any AgentSkills-compatible agent. Each skill calls the ChatSights `fetch_raw_answers`
+Codex, or any AgentSkills-compatible agent. Each skill calls the AgentGEO `fetch_raw_answers`
 MCP tool to pull **real** answers, citations, and sources from ChatGPT, Perplexity, Gemini,
 Google AI Overview, Google AI Mode, and Copilot — then does the Generative Engine Optimization
 (GEO) analysis locally.
@@ -25,7 +25,7 @@ The skills form one loop: **generate prompts → fetch answers → analyze → m
 | **geo-citations** | Extracts the source domains AI answers cite; ranks most-cited domains, your citation rate vs competitors, and "citation gap" domains to earn. |
 | **geo-sentiment** | Characterizes how AI describes your brand — tone, recurring attributes, and framing, with verbatim quotes. |
 | **geo-competitors** | Joins visibility, SoV, citations, and sentiment into one side-by-side competitor matrix and diagnoses why AI favors the leaders. |
-| **geo-monitor** | Registers a prompt set as ChatSights **schedules** and diffs each new run against the last to report trend, new competitors, and lost citations over time. |
+| **geo-monitor** | Registers a prompt set as AgentGEO **schedules** and diffs each new run against the last to report trend, new competitors, and lost citations over time. |
 | **geo-report** | Top-level orchestrator. Synthesizes all of the above into an executive GEO report with a prioritized fix plan. |
 
 ```
@@ -43,12 +43,12 @@ The skills form one loop: **generate prompts → fetch answers → analyze → m
                                   geo-report
 ```
 
-## Prerequisite: the ChatSights MCP
+## Prerequisite: the AgentGEO MCP
 
-Every skill fetches through ChatSights. Connect the MCP once (absolute path in a real config):
+Every skill fetches through AgentGEO. Connect the MCP once (absolute path in a real config):
 
 ```bash
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 ```
 
@@ -74,12 +74,12 @@ auto-invokes `geo-prompt-set`, or run any skill by name.
 
 ## The product boundary (important)
 
-ChatSights returns **raw data only** — answer text, citations, sources, provider metadata. It
+AgentGEO returns **raw data only** — answer text, citations, sources, provider metadata. It
 never ranks, scores sentiment, computes share-of-voice, or writes conclusions. **All scoring and
 judgment happens inside these skills, on the agent side.** No skill attributes a score to
-ChatSights. Every skill also treats fetched `answerText`/`sources` as untrusted content.
+AgentGEO. Every skill also treats fetched `answerText`/`sources` as untrusted content.
 
 ## License
 
 [MIT](../LICENSE) — the skills and MCP client are open source. They connect to
-[ChatSights](https://trychatsights.com), a hosted service with its own terms.
+[AgentGEO](https://agentgeo.org), a hosted service with its own terms.

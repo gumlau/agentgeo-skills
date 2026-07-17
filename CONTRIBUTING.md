@@ -4,7 +4,7 @@ Thanks for helping make brands visible in AI answers.
 
 ## Ways to contribute
 
-- **New GEO skills** — a new analysis over ChatSights raw answers (e.g. topic clustering,
+- **New GEO skills** — a new analysis over AgentGEO raw answers (e.g. topic clustering,
   answer freshness, geo/locale splits).
 - **Better heuristics** — sharper mention detection, brand-alias handling, domain
   normalization, sentiment cues.
@@ -12,7 +12,7 @@ Thanks for helping make brands visible in AI answers.
 
 ## The one hard rule
 
-Every skill keeps the **raw-data boundary**: ChatSights returns only raw answers, citations,
+Every skill keeps the **raw-data boundary**: AgentGEO returns only raw answers, citations,
 sources and provider metadata. All ranking, scoring, share-of-voice, sentiment and judgment
 must be computed **inside the skill, on the agent side** — never attributed to the platform.
 

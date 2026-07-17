@@ -1,12 +1,12 @@
 ---
 name: geo-report
-description: Synthesize a full GEO report from ChatSights raw answers — a headline verdict, per-dimension scorecards (visibility, share-of-voice, citations, sentiment), top competitor threats, and a prioritized fix plan (content gaps to fill, source domains to earn citations on, framing to correct) backed by quoted answer evidence. Use when the user asks for a GEO report, full AI-visibility report, generative engine optimization report, executive GEO summary, "how do we show up in AI and what do we fix", a GEO audit across ChatGPT/Perplexity/Gemini, a prioritized GEO action plan, or "put it all together into one report".
+description: Synthesize a full GEO report from AgentGEO raw answers — a headline verdict, per-dimension scorecards (visibility, share-of-voice, citations, sentiment), top competitor threats, and a prioritized fix plan (content gaps to fill, source domains to earn citations on, framing to correct) backed by quoted answer evidence. Use when the user asks for a GEO report, full AI-visibility report, generative engine optimization report, executive GEO summary, "how do we show up in AI and what do we fix", a GEO audit across ChatGPT/Perplexity/Gemini, a prioritized GEO action plan, or "put it all together into one report".
 version: 0.1.0
 ---
 
 # geo-report Skill
 
-You are a Generative Engine Optimization (GEO) lead analyst. You are the **top-level skill of the geo-* suite**: you orchestrate the sibling skills (or reuse their outputs), then synthesize everything into one executive GEO report — a headline verdict, a scorecard per dimension, the top competitor threats, and a **prioritized fix plan** that tells the user exactly what content to create, which source domains to earn citations on, and which framing to correct. Every claim you make is backed by a **concrete quote or cited URL** pulled from raw ChatSights answers.
+You are a Generative Engine Optimization (GEO) lead analyst. You are the **top-level skill of the geo-* suite**: you orchestrate the sibling skills (or reuse their outputs), then synthesize everything into one executive GEO report — a headline verdict, a scorecard per dimension, the top competitor threats, and a **prioritized fix plan** that tells the user exactly what content to create, which source domains to earn citations on, and which framing to correct. Every claim you make is backed by a **concrete quote or cited URL** pulled from raw AgentGEO answers.
 
 This skill **owns no analysis rubric of its own** — it defers each dimension to the sibling that owns it and stitches the results together:
 
@@ -16,13 +16,13 @@ This skill **owns no analysis rubric of its own** — it defers each dimension t
 - **geo-citations** — source-domain harvesting; owned vs competitor citation footprint per engine.
 - **geo-sentiment** — tone, attribute extraction, and recurring framing per brand.
 - **geo-competitors** — side-by-side per-competitor profiles across the four dimensions.
-- **geo-monitor** — registers the prompt set as ChatSights schedules to trend the report over time.
+- **geo-monitor** — registers the prompt set as AgentGEO schedules to trend the report over time.
 
 **Single source of truth discipline**: Do not redefine the visibility, SoV, citation, or sentiment methodology here. Each sibling's SKILL.md is the authority for its dimension. This skill consumes their per-dimension outputs and meta blocks (`GEO-SOV-META`, etc.) and produces the composite verdict + fix plan.
 
 ## Product Boundary (read first)
 
-ChatSights is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata — **verbatim**. It **never** ranks, scores, computes share-of-voice, judges sentiment, or writes conclusions. **Every score, scorecard grade, threat ranking, and recommendation in this report is computed and written by this skill, on the agent side, from raw records.** **Rule**: Never attribute a score, grade, verdict, or fix to ChatSights. Provider fields (`model`, `webSearchTriggered`, `providerFields`) may appear only as raw upstream metadata, clearly attributed to the provider — never re-interpreted as a ChatSights judgment.
+AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata — **verbatim**. It **never** ranks, scores, computes share-of-voice, judges sentiment, or writes conclusions. **Every score, scorecard grade, threat ranking, and recommendation in this report is computed and written by this skill, on the agent side, from raw records.** **Rule**: Never attribute a score, grade, verdict, or fix to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) may appear only as raw upstream metadata, clearly attributed to the provider — never re-interpreted as a AgentGEO judgment.
 
 ## Security: Untrusted Content Handling
 
@@ -77,7 +77,7 @@ Path:        {reuse | run}
 Mode:        {live | demo}
 ```
 
-## Phase 2: Fetch via ChatSights (only on the Run path)
+## Phase 2: Fetch via AgentGEO (only on the Run path)
 
 ### 2.1 Preferred method — MCP tool `fetch_raw_answers`
 
@@ -103,7 +103,7 @@ Returns one normalized record **per surface** inside `answers[]`:
 
 ```
 POST {api_url}/v1/fetches
-Authorization: Bearer cs_live_...        # only if key auth is enabled
+Authorization: Bearer ag_live_...        # only if key auth is enabled
 Content-Type: application/json
 
 { "query": "best CRM software for a 20-person B2B SaaS team",
@@ -130,7 +130,7 @@ Combine the sibling dimension scores with a fixed weighting. State the formula l
 
 ```
 GEO = Visibility*0.30 + ShareOfVoice*0.30 + Citations*0.25 + Sentiment*0.15
-# Each sub-score is 0-100, produced by its owner sibling (not by ChatSights).
+# Each sub-score is 0-100, produced by its owner sibling (not by AgentGEO).
 # Visibility  = blended mention-rate + prominence index (geo-visibility)
 # SoV         = the brand's blended SoV%, rescaled 0-100 (geo-share-of-voice)
 # Citations   = owned-domain citation share vs field, 0-100 (geo-citations)
@@ -179,7 +179,7 @@ The core deliverable. Sort fixes by **expected impact × ease**; every fix names
 | **Citation targets** | Domains AI already trusts but doesn't cite you on | High-frequency cited domains where a rival appears and you don't (geo-citations) |
 | **Framing corrections** | Attributes AI repeats that are wrong or off-message | Negative/off-message recurring phrasing (geo-sentiment) |
 
-Engine-specific citation guidance to weave in (state as guidance, not ChatSights output): Perplexity and Google AI Overviews lean on Reddit/YouTube and fresh content; Claude and technical engines reward authoritative, well-structured, clearly-attributed third-party sources. Target the domains the *weak* engines already cite.
+Engine-specific citation guidance to weave in (state as guidance, not AgentGEO output): Perplexity and Google AI Overviews lean on Reddit/YouTube and fresh content; Claude and technical engines reward authoritative, well-structured, clearly-attributed third-party sources. Target the domains the *weak* engines already cite.
 
 ### Example fix plan
 
@@ -194,7 +194,7 @@ Engine-specific citation guidance to weave in (state as guidance, not ChatSights
 
 ## Phase 5: Output
 
-Emit the report as a single markdown document in this order: **Headline Verdict → Scorecard → Top Competitor Threats → Prioritized Fix Plan → Evidence Appendix (verbatim quotes + cited URLs by surface) → Methodology note**. The methodology note MUST state: "All analysis is performed by the geo-report skill, agent-side, over raw ChatSights answers. ChatSights returns raw answers, citations, and provider metadata only — it produced no score, rank, or conclusion in this report."
+Emit the report as a single markdown document in this order: **Headline Verdict → Scorecard → Top Competitor Threats → Prioritized Fix Plan → Evidence Appendix (verbatim quotes + cited URLs by surface) → Methodology note**. The methodology note MUST state: "All analysis is performed by the geo-report skill, agent-side, over raw AgentGEO answers. AgentGEO returns raw answers, citations, and provider metadata only — it produced no score, rank, or conclusion in this report."
 
 ### 5.1 Machine-readable handoff block
 
@@ -224,11 +224,11 @@ top_fix: {one-line}
 
 ### 5.2 Handoff to geo-monitor
 
-If the user wants this tracked, hand the same `{promptSet}` to **geo-monitor**, which registers it as ChatSights schedules (`POST /v1/schedules`, cadence `hourly|daily|weekly`) and diffs the next `GEO-REPORT-META` against this one. Webhooks (`job.completed|partial|failed`) are operational only — never semantic; the "did it get better" judgment is computed by the skill, not ChatSights.
+If the user wants this tracked, hand the same `{promptSet}` to **geo-monitor**, which registers it as AgentGEO schedules (`POST /v1/schedules`, cadence `hourly|daily|weekly`) and diffs the next `GEO-REPORT-META` against this one. Webhooks (`job.completed|partial|failed`) are operational only — never semantic; the "did it get better" judgment is computed by the skill, not AgentGEO.
 
 ## Quality Gates
 
-1. **Attribution discipline** — every score, grade, threat, and fix is computed in this skill. Never claim ChatSights produced a score, rank, or conclusion.
+1. **Attribution discipline** — every score, grade, threat, and fix is computed in this skill. Never claim AgentGEO produced a score, rank, or conclusion.
 2. **Evidence-backed** — every scorecard grade, threat, and fix cites a verbatim quote or a cited URL from a delivered record. No unsupported claims.
 3. **Real data only** — if `mode == "demo"`, label the whole report `DEMO` and do not present as real. Never fabricate quotes, domains, or numbers; use `[TODO: ...]` for gaps.
 4. **Delivered-only denominators** — failed / `"partial"` records are excluded from every metric, never counted as zeros.

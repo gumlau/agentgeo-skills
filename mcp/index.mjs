@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * ChatSights local MCP server.
+ * AgentGEO local MCP server.
  *
  * It exposes one deliberately narrow tool: fetch raw AI answer records from
- * the ChatSights REST API. It does not rank, score, summarize, or interpret
+ * the AgentGEO REST API. It does not rank, score, summarize, or interpret
  * the provider response; that work stays in the calling agent.
  */
 
@@ -23,9 +23,9 @@ function readArg(name) {
 }
 
 const apiUrl = (
-  readArg("--api-url") || process.env.CHATSIGHTS_API_URL || "http://localhost:8080"
+  readArg("--api-url") || process.env.AGENTGEO_API_URL || "http://localhost:8080"
 ).replace(/\/$/, "");
-const apiKey = readArg("--key") || process.env.CHATSIGHTS_API_KEY || "";
+const apiKey = readArg("--key") || process.env.AGENTGEO_API_KEY || "";
 
 function write(message) {
   process.stdout.write(`${JSON.stringify(message)}\n`);
@@ -47,7 +47,7 @@ const fetchTool = {
   name: "fetch_raw_answers",
   title: "Fetch raw AI answers",
   description:
-    "Fetch raw answer text, citations, and provider metadata through ChatSights' managed AI scrapers. Returns no ranking, sentiment, visibility score, or other analysis.",
+    "Fetch raw answer text, citations, and provider metadata through AgentGEO' managed AI scrapers. Returns no ranking, sentiment, visibility score, or other analysis.",
   inputSchema: {
     type: "object",
     additionalProperties: false,
@@ -104,7 +104,7 @@ async function callFetchTool(id, args) {
     try {
       payload = JSON.parse(text);
     } catch {
-      payload = { detail: text || `ChatSights returned HTTP ${response.status}` };
+      payload = { detail: text || `AgentGEO returned HTTP ${response.status}` };
     }
 
     if (!response.ok) {
@@ -124,7 +124,7 @@ async function callFetchTool(id, args) {
       isError: true,
       content: [{
         type: "text",
-        text: `ChatSights API is unavailable at ${apiUrl}: ${cause instanceof Error ? cause.message : String(cause)}`,
+        text: `AgentGEO API is unavailable at ${apiUrl}: ${cause instanceof Error ? cause.message : String(cause)}`,
       }],
     });
   }
@@ -143,7 +143,7 @@ async function handle(message) {
       result(message.id, {
         protocolVersion: message.params?.protocolVersion || "2025-06-18",
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "chatsights-local", version: "0.1.0" },
+        serverInfo: { name: "agentgeo-local", version: "0.1.0" },
         instructions:
           "Use fetch_raw_answers to retrieve raw provider records. Perform ranking, sentiment, comparisons, and reporting locally in the agent.",
       });

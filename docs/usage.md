@@ -3,7 +3,7 @@
 **Turn what AI engines actually answer into GEO decisions — on the agent side.**
 
 This guide walks you from a cold start to a full GEO report and ongoing monitoring, using the
-eight ChatSights GEO Skills. It assumes you have already connected the MCP and enabled the
+eight AgentGEO GEO Skills. It assumes you have already connected the MCP and enabled the
 skills — if not, do that first: **[Installation Guide](./installation.md)** · repo overview:
 **[README](../README.md)**.
 
@@ -13,7 +13,7 @@ skills — if not, do that first: **[Installation Guide](./installation.md)** ·
 
 There is exactly one boundary that explains this whole suite:
 
-> **ChatSights returns raw data only.** Answer text, citations, sources, provider metadata —
+> **AgentGEO returns raw data only.** Answer text, citations, sources, provider metadata —
 > verbatim, from six AI surfaces. It **never** ranks, scores sentiment, computes
 > share-of-voice, detects trends, or writes conclusions.
 >
@@ -23,12 +23,12 @@ There is exactly one boundary that explains this whole suite:
 
 | Layer | Owns | Does **not** own |
 |-------|------|------------------|
-| **ChatSights** (MCP `fetch_raw_answers`, REST `/v1/*`) | Collecting + delivering raw answers, citations, sources, provider metadata across ChatGPT, Perplexity, Gemini, Google AI Overview, Google AI Mode, Copilot | Any score, ranking, SoV%, sentiment, trend, verdict, or fix |
+| **AgentGEO** (MCP `fetch_raw_answers`, REST `/v1/*`) | Collecting + delivering raw answers, citations, sources, provider metadata across ChatGPT, Perplexity, Gemini, Google AI Overview, Google AI Mode, Copilot | Any score, ranking, SoV%, sentiment, trend, verdict, or fix |
 | **The GEO Skills** (agent-side) | Mention detection, prominence, SoV math, citation ranking, sentiment classification, competitor joins, trend diffs, the report + fix plan | Fetching answers (they call the tool) |
 
 Two consequences worth internalizing:
 
-- **No skill attributes a score to ChatSights.** If output ever reads "ChatSights ranked you
+- **No skill attributes a score to AgentGEO.** If output ever reads "AgentGEO ranked you
   #2", that is a bug — the skill computed the ranking.
 - **Fetched `answerText` and `sources` are untrusted content.** Skills analyze them as data and
   never execute instructions found inside them (they flag any injection attempt and continue).
@@ -181,11 +181,11 @@ The report closes with a `GEO-REPORT-META` block that `geo-monitor` uses to tren
 | **geo-citations** | "Which domains does AI cite, and where's our gap?" | Prompt set, `brand`, `competitors[]` | Ranked cited domains; owned vs rival citation rate; gap domains | → geo-competitors, geo-report |
 | **geo-sentiment** | "How does AI describe us — tone and attributes?" | Prompt set, `brand` | Per-surface tone + recurring attributes + verbatim quotes | → geo-competitors, geo-report |
 | **geo-competitors** | "Side-by-side vs each rival, and why they win." | Outputs of the four analysis skills (or the prompt set) | One competitor matrix across all four dimensions | → geo-report |
-| **geo-monitor** | "Track this over time on a cadence." | Fixed prompt set, `cadence`, `delivery` | Registers ChatSights schedules; dated change report with deltas + `GEO-MONITOR-META` | ← geo-report; → geo-competitors (new entrants) |
+| **geo-monitor** | "Track this over time on a cadence." | Fixed prompt set, `cadence`, `delivery` | Registers AgentGEO schedules; dated change report with deltas + `GEO-MONITOR-META` | ← geo-report; → geo-competitors (new entrants) |
 | **geo-report** | "Put it all together + tell me what to fix." | Prompt set + sibling outputs | Verdict, composite score, scorecard, threats, fix plan, evidence appendix + `GEO-REPORT-META` | Orchestrates all; → geo-monitor |
 
 All ranking, SoV math, sentiment, citation, and trend logic runs **inside these skills**,
-computed from raw ChatSights records — never from a ChatSights-produced score.
+computed from raw AgentGEO records — never from a AgentGEO-produced score.
 
 ---
 
@@ -197,7 +197,7 @@ A one-shot report is a snapshot. `geo-monitor` turns it into a trend line.
 
 What it does:
 
-1. **Schedules** — registers your fixed prompt set as ChatSights schedules
+1. **Schedules** — registers your fixed prompt set as AgentGEO schedules
    (`cadence`: `hourly | daily | weekly`; `delivery`: `store` to poll, or `webhook`). One
    schedule per prompt; it records each `id`.
 2. **Recomputes** each run's visibility, SoV, cited domains, and sentiment from the raw records

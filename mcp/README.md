@@ -1,9 +1,9 @@
-# ChatSights local MCP server
+# AgentGEO local MCP server
 
 This stdio MCP server gives Claude Code, Cursor, Codex, and other MCP clients
 one tool: `fetch_raw_answers`.
 
-It calls the local or hosted ChatSights REST API and returns the normalized raw
+It calls the local or hosted AgentGEO REST API and returns the normalized raw
 answer records unchanged. It does not calculate rankings, sentiment, share of
 voice, confidence, or conclusions.
 
@@ -15,20 +15,20 @@ the client can start it from any working directory, targeting the hosted API
 
 ```bash
 # Run this file directly against the hosted API
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
-  --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
+  --api-url https://api.agentgeo.org
 
 # …or, for local development, target your own API
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 
 # From npm (coming soon — package not published yet)
-claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
 ```
 
-If API key authentication is enabled, append `--key cs_live_...` or set
-`CHATSIGHTS_API_KEY`. Keys are created in the console under **API keys**
+If API key authentication is enabled, append `--key ag_live_...` or set
+`AGENTGEO_API_KEY`. Keys are created in the console under **API keys**
 (`/app/keys`); creating the first key turns auth enforcement on. To target a
-hosted API, set `--api-url` or `CHATSIGHTS_API_URL`.
+hosted API, set `--api-url` or `AGENTGEO_API_URL`.
 
 No npm install is required; the server uses Node.js built-ins only.

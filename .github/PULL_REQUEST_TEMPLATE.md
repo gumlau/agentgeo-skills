@@ -1,4 +1,4 @@
-<!-- Thanks for contributing to ChatSights GEO Skills! -->
+<!-- Thanks for contributing to AgentGEO GEO Skills! -->
 
 ## What this changes
 
@@ -15,7 +15,7 @@
 ## Checklist
 
 - [ ] The change keeps the **raw-data boundary**: all ranking / scoring / SoV /
-      sentiment / judgment stays agent-side, never attributed to ChatSights.
+      sentiment / judgment stays agent-side, never attributed to AgentGEO.
 - [ ] Any skill that reads AI answers treats `answerText` / `sources` as
       **untrusted content** (no executing instructions found inside).
 - [ ] `node --check mcp/index.mjs` passes (if the MCP changed).

@@ -1,4 +1,4 @@
-name: Publish chatsights-mcp
+name: Publish agentgeo-mcp
 
 # Publishes mcp/ to npm when a GitHub Release is published, or on manual dispatch.
 # Requires an NPM_TOKEN repo secret (npm "Automation" token). See RELEASING.md.

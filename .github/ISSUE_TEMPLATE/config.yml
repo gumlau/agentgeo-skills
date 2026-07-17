@@ -1,8 +1,8 @@
 blank_issues_enabled: true
 contact_links:
-  - name: ChatSights docs & API keys
-    url: https://trychatsights.com
-    about: Product docs, pricing and API keys for the hosted ChatSights service.
+  - name: AgentGEO docs & API keys
+    url: https://agentgeo.org
+    about: Product docs, pricing and API keys for the hosted AgentGEO service.
   - name: Security report
-    url: https://github.com/gumlau/chatsights-geo-skills/security/policy
+    url: https://github.com/gumlau/agentgeo-skills/security/policy
     about: Please report vulnerabilities privately, not as a public issue.

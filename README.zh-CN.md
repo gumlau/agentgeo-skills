@@ -1,11 +1,11 @@
 <div align="center">
 
-# ChatSights GEO Skills
+# AgentGEO GEO Skills
 
 **把 AI 引擎真实的回答,变成 GEO 决策 —— 全部在 agent 侧完成。**
 
 一套开源的八个 Agent Skill + 一个零依赖 MCP 服务器。你的编码 agent 通过
-[ChatSights](https://trychatsights.com) 跨六个 AI 界面拉取**真实的**答案、引用与来源
+[AgentGEO](https://agentgeo.org) 跨六个 AI 界面拉取**真实的**答案、引用与来源
 —— ChatGPT、Perplexity、Gemini、Google AI Overview、Google AI Mode、Copilot ——
 然后在本地完成生成式引擎优化(GEO)分析。
 
@@ -14,11 +14,11 @@
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
   <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
-  <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/Powered%20by-ChatSights-181818.svg" alt="Powered by ChatSights"></a>
+  <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
 <p>
-  <a href="https://x.com/chatsights"><img src="https://img.shields.io/badge/Follow%20on%20X-000000?logo=x&logoColor=white&style=for-the-badge" alt="Follow on X"></a>
-  <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/trychatsights.com-181818?style=for-the-badge&logoColor=white" alt="trychatsights.com"></a>
+  <a href="https://x.com/agentgeo"><img src="https://img.shields.io/badge/Follow%20on%20X-000000?logo=x&logoColor=white&style=for-the-badge" alt="Follow on X"></a>
+  <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/agentgeo.org-181818?style=for-the-badge&logoColor=white" alt="agentgeo.org"></a>
 </p>
 
 <p>
@@ -34,19 +34,19 @@
 
 </div>
 
-## ChatSights GEO Skills
+## AgentGEO GEO Skills
 
 大多数 GEO 工具检查的是*你自己*的 HTML、robots.txt 和 schema,然后**猜测** AI 能不能看见你。
 而这些 skill 读取的是 AI 引擎**真实说出口**的内容 —— 所以可见度、声量占比(share-of-voice)、
 引用和情感,全都来自真实数据,而非推断。
 
-数据来自 ChatSights —— 一个架在托管 AI 抓取器之上的轻量访问层。它**只**返回原始答案、引用、
+数据来自 AgentGEO —— 一个架在托管 AI 抓取器之上的轻量访问层。它**只**返回原始答案、引用、
 来源和 provider 元数据。本仓库里的每一个分数、排名和判断,都是由 skill 在你的 agent 内部计算的
 —— 平台从不代劳。
 
 ### 工作原理
 
-你的编码 agent 通过本仓库的两个部分接入 ChatSights:
+你的编码 agent 通过本仓库的两个部分接入 AgentGEO:
 
 - **MCP 服务器**(`mcp/`)—— 暴露一个职责单一的工具 `fetch_raw_answers`,任何兼容 MCP 的
   agent(Claude Code、Cursor、Codex)都能调用。
@@ -59,11 +59,11 @@ graph TB
         AG[AI Coding Agent · Claude Code / Cursor / Codex]
     end
     subgraph MID[" "]
-        SK[ChatSights GEO Skills]
+        SK[AgentGEO GEO Skills]
     end
     AG --> SK
-    SK -->|fetch_raw_answers| MCP[ChatSights MCP]
-    MCP -->|REST /v1/fetches| API[ChatSights API]
+    SK -->|fetch_raw_answers| MCP[AgentGEO MCP]
+    MCP -->|REST /v1/fetches| API[AgentGEO API]
     API --> SCR[Managed AI Scrapers]
     SCR --> C1[ChatGPT]
     SCR --> C2[Perplexity]
@@ -93,7 +93,7 @@ graph TB
 | **geo-citations** | AI 答案引用了哪些来源域名;你的被引率 vs 竞品,以及值得去争取的"缺口域名"。 |
 | **geo-sentiment** | AI 如何描述你的品牌 —— 语气、属性和措辞,附带逐字引用。 |
 | **geo-competitors** | 把可见度 + 声量占比 + 引用 + 情感,合并成一张竞品矩阵。 |
-| **geo-monitor** | 将一套 prompt 注册为 ChatSights schedule,逐次 diff 以报告随时间的趋势。 |
+| **geo-monitor** | 将一套 prompt 注册为 AgentGEO schedule,逐次 diff 以报告随时间的趋势。 |
 | **geo-report** | 顶层编排:把上述一切综合成一份高管级报告 + 优先级修复清单。 |
 
 ```mermaid
@@ -117,7 +117,7 @@ flowchart TD
 sequenceDiagram
     participant U as You
     participant A as Agent + Skill
-    participant M as ChatSights MCP
+    participant M as AgentGEO MCP
     participant E as AI Engines
     U->>A: "GEO analysis for acme.com vs rivals"
     A->>A: geo-prompt-set builds the prompt library
@@ -138,24 +138,24 @@ sequenceDiagram
 > 📖 各客户端(Claude Code / Cursor / Codex)的完整分步配置,以及端到端演练:
 > **[安装指南](./docs/installation.md)** · **[使用指南](./docs/usage.md)**
 
-### 前置 —— 连接 ChatSights MCP
+### 前置 —— 连接 AgentGEO MCP
 
 ```bash
 # 用本仓库的 MCP 连接托管 API —— 现在就能用(绝对路径)
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
-  --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
+  --api-url https://api.agentgeo.org
 
 # …本地开发替代方案:连接你自己跑的本地 API
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 
 # …或从 npm 运行(即将上线)
-claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
 ```
 
-在没有 provider 凭证时,ChatSights 会返回带标注的**演示数据(demo fixtures),零 credit 消耗**,
-让你在花钱之前先把每个 skill 跑通。到 [trychatsights.com](https://trychatsights.com) 获取 API key,
-并在 [app.trychatsights.com](https://app.trychatsights.com) 的控制台里管理它们。
+在没有 provider 凭证时,AgentGEO 会返回带标注的**演示数据(demo fixtures),零 credit 消耗**,
+让你在花钱之前先把每个 skill 跑通。到 [agentgeo.org](https://agentgeo.org) 获取 API key,
+并在 [app.agentgeo.org](https://app.agentgeo.org) 的控制台里管理它们。
 
 ### 启用这些 skill
 
@@ -177,12 +177,12 @@ claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychat
 Start a GEO analysis for acme.com against notion.com and coda.io
 ```
 
-agent 会自动触发 `geo-prompt-set`,通过 ChatSights 拉取数据,并沿着闭环一路走到
+agent 会自动触发 `geo-prompt-set`,通过 AgentGEO 拉取数据,并沿着闭环一路走到
 `geo-report`。你也可以按名字调用任意一个 skill。
 
 ## 产品边界
 
-ChatSights **只返回原始数据** —— 答案文本、引用、来源、provider 元数据。它从不排名、不打情感分、
+AgentGEO **只返回原始数据** —— 答案文本、引用、来源、provider 元数据。它从不排名、不打情感分、
 不计算声量占比、也不下结论。**所有分析都发生在这些 skill 内部、在 agent 侧完成。** skill 同时把拉取到的
 `answerText` 和 `sources` 视为不可信内容,绝不执行其中出现的任何指令。
 
@@ -193,19 +193,19 @@ ChatSights **只返回原始数据** —— 答案文本、引用、来源、pro
 
 ## 社区与支持
 
-- **文档与 API key** —— [trychatsights.com](https://trychatsights.com)
+- **文档与 API key** —— [agentgeo.org](https://agentgeo.org)
 - **Issues** —— 在本仓库提交 bug 或 skill 想法
-- **动态** —— [@chatsights on X](https://x.com/chatsights)
+- **动态** —— [@agentgeo on X](https://x.com/agentgeo)
 
 ## 许可
 
 skill 和 MCP 客户端采用 [MIT](./LICENSE) 许可。它们连接的是
-[ChatSights](https://trychatsights.com) —— 一个有自身条款的托管服务。
+[AgentGEO](https://agentgeo.org) —— 一个有自身条款的托管服务。
 
-## Built with ChatSights
+## Built with AgentGEO
 
 在你的项目里用了这些 skill?加上徽章:
 
 ```md
-[![Powered by ChatSights](https://img.shields.io/badge/Powered%20by-ChatSights-181818.svg)](https://trychatsights.com)
+[![Powered by AgentGEO](https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg)](https://agentgeo.org)
 ```

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Link the ChatSights GEO skills into a directory your coding agent scans.
+# Link the AgentGEO GEO skills into a directory your coding agent scans.
 #
 #   ./scripts/enable-skills.sh            # this project only  -> ./.claude/skills
 #   ./scripts/enable-skills.sh --global   # every project      -> ~/.claude/skills

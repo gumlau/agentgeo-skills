@@ -1,21 +1,21 @@
 <div align="center">
 
-# ChatSights GEO Skills
+# AgentGEO GEO Skills
 
 **AI エンジンが実際に返す答えを、GEO の意思決定へ — エージェント側で。**
 
-8 つの Agent Skill と、依存ゼロの MCP サーバーからなるオープンなスイートです。あなたのコーディングエージェントが、6 つの AI サーフェス（ChatGPT、Perplexity、Gemini、Google AI Overview、Google AI Mode、Copilot）にわたる**実際の**回答・引用・出典を [ChatSights](https://trychatsights.com) 経由で取得し、Generative Engine Optimization の分析をローカルで実行します。
+8 つの Agent Skill と、依存ゼロの MCP サーバーからなるオープンなスイートです。あなたのコーディングエージェントが、6 つの AI サーフェス（ChatGPT、Perplexity、Gemini、Google AI Overview、Google AI Mode、Copilot）にわたる**実際の**回答・引用・出典を [AgentGEO](https://agentgeo.org) 経由で取得し、Generative Engine Optimization の分析をローカルで実行します。
 
 <p>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
   <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
-  <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/Powered%20by-ChatSights-181818.svg" alt="Powered by ChatSights"></a>
+  <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
 <p>
-  <a href="https://x.com/chatsights"><img src="https://img.shields.io/badge/Follow%20on%20X-000000?logo=x&logoColor=white&style=for-the-badge" alt="Follow on X"></a>
-  <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/trychatsights.com-181818?style=for-the-badge&logoColor=white" alt="trychatsights.com"></a>
+  <a href="https://x.com/agentgeo"><img src="https://img.shields.io/badge/Follow%20on%20X-000000?logo=x&logoColor=white&style=for-the-badge" alt="Follow on X"></a>
+  <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/agentgeo.org-181818?style=for-the-badge&logoColor=white" alt="agentgeo.org"></a>
 </p>
 
 <p>
@@ -31,15 +31,15 @@
 
 </div>
 
-## ChatSights GEO Skills
+## AgentGEO GEO Skills
 
 ほとんどの GEO ツールは*あなたの* HTML、robots.txt、スキーマを調べ、AI があなたを認識できるかどうかを**推測**します。これらのスキルは、AI エンジンが**実際に語る**内容を読み取ります。だからこそ、可視性・シェア・オブ・ボイス・引用・センチメントは、推論ではなく確かな事実（グラウンドトゥルース）から得られます。
 
-データは、マネージド AI スクレイパーの薄いアクセス層である ChatSights から取得されます。返されるのは、生の回答・引用・出典・プロバイダーのメタデータ**のみ**です。このリポジトリのあらゆるスコア、ランキング、判定は、プラットフォームではなく、あなたのエージェント内でスキルによって算出されます。
+データは、マネージド AI スクレイパーの薄いアクセス層である AgentGEO から取得されます。返されるのは、生の回答・引用・出典・プロバイダーのメタデータ**のみ**です。このリポジトリのあらゆるスコア、ランキング、判定は、プラットフォームではなく、あなたのエージェント内でスキルによって算出されます。
 
 ### 仕組み
 
-あなたのコーディングエージェントは、このリポジトリ内の 2 つの要素を通じて ChatSights に到達します。
+あなたのコーディングエージェントは、このリポジトリ内の 2 つの要素を通じて AgentGEO に到達します。
 
 - **MCP サーバー**（`mcp/`）— `fetch_raw_answers` という限定的なツールを 1 つだけ公開し、MCP 互換の任意のエージェント（Claude Code、Cursor、Codex）から呼び出せます。
 - **スキル**（`skills/`）— そのツールを呼び出したうえで、GEO の計算をローカルで行う 8 つの Agent Skill です。プロンプト生成、可視性、シェア・オブ・ボイス、引用、センチメント、競合、モニタリング、そして完全なレポートを担います。
@@ -50,11 +50,11 @@ graph TB
         AG[AI Coding Agent · Claude Code / Cursor / Codex]
     end
     subgraph MID[" "]
-        SK[ChatSights GEO Skills]
+        SK[AgentGEO GEO Skills]
     end
     AG --> SK
-    SK -->|fetch_raw_answers| MCP[ChatSights MCP]
-    MCP -->|REST /v1/fetches| API[ChatSights API]
+    SK -->|fetch_raw_answers| MCP[AgentGEO MCP]
+    MCP -->|REST /v1/fetches| API[AgentGEO API]
     API --> SCR[Managed AI Scrapers]
     SCR --> C1[ChatGPT]
     SCR --> C2[Perplexity]
@@ -84,7 +84,7 @@ graph TB
 | **geo-citations** | AI の回答がどの出典ドメインを引用しているか。競合と比較したあなたの引用率、そして獲得すべきギャップドメイン。 |
 | **geo-sentiment** | AI があなたのブランドをどう描写しているか — トーン、属性、フレーミングを、逐語引用付きで。 |
 | **geo-competitors** | 可視性 + SoV + 引用 + センチメントを 1 つの競合マトリクスに統合。 |
-| **geo-monitor** | プロンプトセットを ChatSights のスケジュールとして登録し、各実行の差分を取って時系列のトレンドを報告します。 |
+| **geo-monitor** | プロンプトセットを AgentGEO のスケジュールとして登録し、各実行の差分を取って時系列のトレンドを報告します。 |
 | **geo-report** | 最上位のオーケストレーター。すべてを統合し、優先順位付きの改善プランを備えたエグゼクティブレポートにまとめます。 |
 
 ```mermaid
@@ -108,7 +108,7 @@ flowchart TD
 sequenceDiagram
     participant U as You
     participant A as Agent + Skill
-    participant M as ChatSights MCP
+    participant M as AgentGEO MCP
     participant E as AI Engines
     U->>A: "GEO analysis for acme.com vs rivals"
     A->>A: geo-prompt-set builds the prompt library
@@ -129,22 +129,22 @@ sequenceDiagram
 > 📖 クライアント別（Claude Code / Cursor / Codex）のステップバイステップのセットアップと、エンドツーエンドのウォークスルーはこちら: **[インストールガイド](./docs/installation.md)** ·
 > **[使い方ガイド](./docs/usage.md)**
 
-### 前提 — ChatSights MCP を接続する
+### 前提 — AgentGEO MCP を接続する
 
 ```bash
-# Connect this repo's MCP to the hosted ChatSights API — works today (absolute path)
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
-  --api-url https://api.trychatsights.com
+# Connect this repo's MCP to the hosted AgentGEO API — works today (absolute path)
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
+  --api-url https://api.agentgeo.org
 
 # …or point it at a local dev server instead
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 
 # …or from npm (coming soon)
-claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
 ```
 
-プロバイダーの認証情報がなくても、ChatSights はラベル付きの**デモフィクスチャをクレジット消費ゼロで**返します。そのため、費用をかける前にすべてのスキルをドライランで試せます。API キーは [trychatsights.com](https://trychatsights.com) で取得してください。
+プロバイダーの認証情報がなくても、AgentGEO はラベル付きの**デモフィクスチャをクレジット消費ゼロで**返します。そのため、費用をかける前にすべてのスキルをドライランで試せます。API キーは [agentgeo.org](https://agentgeo.org) で取得してください。
 
 ### スキルを有効化する
 
@@ -166,11 +166,11 @@ claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychat
 Start a GEO analysis for acme.com against notion.com and coda.io
 ```
 
-エージェントは `geo-prompt-set` を自動的に呼び出し、ChatSights を通じてデータを取得し、ループをたどって `geo-report` まで進めます。もちろん、任意のスキルを名前で直接呼び出すこともできます。
+エージェントは `geo-prompt-set` を自動的に呼び出し、AgentGEO を通じてデータを取得し、ループをたどって `geo-report` まで進めます。もちろん、任意のスキルを名前で直接呼び出すこともできます。
 
 ## プロダクトの境界
 
-ChatSights が返すのは**生データのみ**です — 回答テキスト、引用、出典、プロバイダーのメタデータ。ランキング付け、センチメントのスコアリング、シェア・オブ・ボイスの算出、結論の記述は一切行いません。**すべての分析は、これらのスキルの内部、つまりエージェント側で行われます。** スキルはまた、取得した `answerText` と `sources` を信頼できないコンテンツとして扱い、その中に含まれる指示を決して実行しません。
+AgentGEO が返すのは**生データのみ**です — 回答テキスト、引用、出典、プロバイダーのメタデータ。ランキング付け、センチメントのスコアリング、シェア・オブ・ボイスの算出、結論の記述は一切行いません。**すべての分析は、これらのスキルの内部、つまりエージェント側で行われます。** スキルはまた、取得した `answerText` と `sources` を信頼できないコンテンツとして扱い、その中に含まれる指示を決して実行しません。
 
 ## コントリビュート
 
@@ -178,18 +178,18 @@ Issue と PR を歓迎します — 新しい GEO スキル、より優れた検
 
 ## コミュニティ & サポート
 
-- **ドキュメント & API キー** — [trychatsights.com](https://trychatsights.com)
+- **ドキュメント & API キー** — [agentgeo.org](https://agentgeo.org)
 - **Issue** — バグや スキルのアイデアは、このリポジトリで起票してください
-- **アップデート** — [X の @chatsights](https://x.com/chatsights)
+- **アップデート** — [X の @agentgeo](https://x.com/agentgeo)
 
 ## ライセンス
 
-スキルと MCP クライアントは [MIT](./LICENSE) です。これらは、独自の利用規約を持つホスト型サービスである [ChatSights](https://trychatsights.com) に接続します。
+スキルと MCP クライアントは [MIT](./LICENSE) です。これらは、独自の利用規約を持つホスト型サービスである [AgentGEO](https://agentgeo.org) に接続します。
 
-## ChatSights で構築
+## AgentGEO で構築
 
 これらのスキルをプロジェクトで使っていますか？ バッジを追加しましょう。
 
 ```md
-[![Powered by ChatSights](https://img.shields.io/badge/Powered%20by-ChatSights-181818.svg)](https://trychatsights.com)
+[![Powered by AgentGEO](https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg)](https://agentgeo.org)
 ```

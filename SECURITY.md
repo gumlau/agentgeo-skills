@@ -4,7 +4,7 @@
 
 Please **do not** open a public issue for security problems.
 
-Email **security@trychatsights.com** with:
+Email **security@agentgeo.org** with:
 
 - a description of the issue and its impact,
 - steps to reproduce (or a proof of concept),
@@ -19,13 +19,13 @@ ships.
 This repository contains the open-source **skills** (prompt/instruction files)
 and the **MCP client** (`mcp/`). Relevant concerns include:
 
-- The MCP client mishandling credentials passed via `--key` / `CHATSIGHTS_API_KEY`
+- The MCP client mishandling credentials passed via `--key` / `AGENTGEO_API_KEY`
   (e.g. leaking them into logs).
 - A skill that could be steered by **untrusted answer content** into unsafe
   actions. Every skill treats fetched `answerText`/`sources` as data, never
   instructions — reports of prompt-injection bypasses are in scope.
 
-The hosted ChatSights API and console are covered separately; report those to the
+The hosted AgentGEO API and console are covered separately; report those to the
 same address.
 
 ## Supported versions

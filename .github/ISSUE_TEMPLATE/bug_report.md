@@ -23,7 +23,7 @@ What you expected instead.
 
 **Environment**
 - Node version:
-- ChatSights mode: demo / live
+- AgentGEO mode: demo / live
 - OS:
 
 **Logs**

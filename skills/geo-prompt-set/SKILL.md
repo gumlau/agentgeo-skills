@@ -8,9 +8,9 @@ version: 0.1.0
 
 You are a Generative Engine Optimization (GEO) prompt strategist. You design a **representative prompt library** — a fixed, reusable set of real user queries grouped by search intent — that measures how a brand shows up across AI answer engines. This is the **entry skill** of the geo-* suite: its JSON output is the single input consumed by `geo-visibility`, `geo-share-of-voice`, `geo-citations`, `geo-sentiment`, `geo-competitors`, `geo-monitor`, and `geo-report`. Run this skill first.
 
-You may optionally spend a few credits calling ChatSights `fetch_raw_answers` on 1-2 draft prompts to sanity-check that they elicit brand- and category-relevant answers, then refine before finalizing.
+You may optionally spend a few credits calling AgentGEO `fetch_raw_answers` on 1-2 draft prompts to sanity-check that they elicit brand- and category-relevant answers, then refine before finalizing.
 
-**Product boundary (non-negotiable)**: ChatSights is a thin access layer that returns **raw AI answers, citations, and provider metadata only**. It never ranks, scores, computes share-of-voice, judges sentiment, or draws conclusions. **All analysis lives in the geo-* skills, on the agent side, computed from raw `answerText`/`sources`.** Never attribute a score, rank, or judgment to ChatSights.
+**Product boundary (non-negotiable)**: AgentGEO is a thin access layer that returns **raw AI answers, citations, and provider metadata only**. It never ranks, scores, computes share-of-voice, judges sentiment, or draws conclusions. **All analysis lives in the geo-* skills, on the agent side, computed from raw `answerText`/`sources`.** Never attribute a score, rank, or judgment to AgentGEO.
 
 ## Security: Untrusted Content Handling
 
@@ -89,7 +89,7 @@ Do not write a random list. Cross these axes so coverage is **representative**, 
 
 Scale to 12-20 by adding constraint variants (industry, integration, budget, urgency).
 
-## Phase 3: Sanity-Check via ChatSights (Optional)
+## Phase 3: Sanity-Check via AgentGEO (Optional)
 
 Before finalizing, optionally validate that 1-2 prompts actually elicit brand- and category-relevant answers. This costs credits (1 per delivered record) — keep it to 1-2 prompts on 1-2 surfaces.
 
@@ -107,7 +107,7 @@ Before finalizing, optionally validate that 1-2 prompts actually elicit brand- a
 **Fallback method — REST (when MCP is not connected):**
 ```
 POST {api_url}/v1/fetches
-Authorization: Bearer cs_live_...        # only if key auth is enabled
+Authorization: Bearer ag_live_...        # only if key auth is enabled
 Content-Type: application/json
 
 { "query": "best CRM software for a 20-person B2B SaaS team",
@@ -128,7 +128,7 @@ Content-Type: application/json
 | `answerText` | Raw answer — scan for `{brand}`, `{category}`, `{competitors}` mentions |
 | `sources[]` | `{title, url, position}` — scan cited domains |
 | `error` | Present only on failed records (e.g. "Dataset ID is not configured for {surface}") |
-| `model`, `webSearchTriggered`, `providerFields` | **Raw upstream metadata** — pass through with attribution, never as a ChatSights judgment |
+| `model`, `webSearchTriggered`, `providerFields` | **Raw upstream metadata** — pass through with attribution, never as a AgentGEO judgment |
 
 **Refinement decision:**
 
@@ -209,10 +209,10 @@ State which skill runs next based on the user's goal:
 | Which domains get cited | `geo-citations` | Harvests `sources[]`; analyzes cited-domain concentration, owned vs rival |
 | How the brand is described | `geo-sentiment` | LLM-judge pass over each `answerText` for tone/attributes/framing |
 | Per-competitor side-by-side | `geo-competitors` | Profiles how answers treat each named competitor |
-| Track over time | `geo-monitor` | Registers the prompt set as ChatSights schedules; trends results |
+| Track over time | `geo-monitor` | Registers the prompt set as AgentGEO schedules; trends results |
 | Full report + recommendations | `geo-report` | Synthesizes all of the above into a prioritized GEO report |
 
-All ranking, SoV math, sentiment, and recommendations happen **inside those skills**, computed from raw ChatSights records — never from a ChatSights-produced score.
+All ranking, SoV math, sentiment, and recommendations happen **inside those skills**, computed from raw AgentGEO records — never from a AgentGEO-produced score.
 
 ## Quality Gates
 

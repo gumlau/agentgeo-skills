@@ -1,13 +1,13 @@
 <div align="center">
 
-# ChatSights GEO Skills
+# AgentGEO GEO Skills
 
 **Turn what AI engines actually answer into GEO decisions — on the agent side.**
 
 An open suite of eight Agent Skills + a zero-dependency MCP server. Your coding agent
 pulls **real** answers, citations and sources across six AI surfaces — ChatGPT, Perplexity,
 Gemini, Google AI Overview, Google AI Mode and Copilot — through
-[ChatSights](https://trychatsights.com), then runs the Generative Engine Optimization
+[AgentGEO](https://agentgeo.org), then runs the Generative Engine Optimization
 analysis locally.
 
 <p>
@@ -15,11 +15,11 @@ analysis locally.
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
   <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
-  <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/Powered%20by-ChatSights-181818.svg" alt="Powered by ChatSights"></a>
+  <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
 <p>
-  <a href="https://x.com/chatsights"><img src="https://img.shields.io/badge/Follow%20on%20X-000000?logo=x&logoColor=white&style=for-the-badge" alt="Follow on X"></a>
-  <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/trychatsights.com-181818?style=for-the-badge&logoColor=white" alt="trychatsights.com"></a>
+  <a href="https://x.com/agentgeo"><img src="https://img.shields.io/badge/Follow%20on%20X-000000?logo=x&logoColor=white&style=for-the-badge" alt="Follow on X"></a>
+  <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/agentgeo.org-181818?style=for-the-badge&logoColor=white" alt="agentgeo.org"></a>
 </p>
 
 <p>
@@ -35,19 +35,19 @@ analysis locally.
 
 </div>
 
-## ChatSights GEO Skills
+## AgentGEO GEO Skills
 
 Most GEO tools inspect *your* HTML, robots.txt and schema and **guess** whether AI can see
 you. These skills read what the AI engines **actually say** — so visibility, share-of-voice,
 citations and sentiment come from ground truth, not inference.
 
-The data comes from ChatSights, a thin access layer over managed AI scrapers. It returns
+The data comes from AgentGEO, a thin access layer over managed AI scrapers. It returns
 **only** raw answers, citations, sources and provider metadata. Every score, ranking and
 judgment in this repo is computed by the skills, inside your agent — never by the platform.
 
 ### How it works
 
-Your coding agent reaches ChatSights through two pieces in this repo:
+Your coding agent reaches AgentGEO through two pieces in this repo:
 
 - **MCP server** (`mcp/`) — exposes one narrow tool, `fetch_raw_answers`, that any
   MCP-compatible agent (Claude Code, Cursor, Codex) can call.
@@ -61,11 +61,11 @@ graph TB
         AG[AI Coding Agent · Claude Code / Cursor / Codex]
     end
     subgraph MID[" "]
-        SK[ChatSights GEO Skills]
+        SK[AgentGEO GEO Skills]
     end
     AG --> SK
-    SK -->|fetch_raw_answers| MCP[ChatSights MCP]
-    MCP -->|REST /v1/fetches| API[ChatSights API]
+    SK -->|fetch_raw_answers| MCP[AgentGEO MCP]
+    MCP -->|REST /v1/fetches| API[AgentGEO API]
     API --> SCR[Managed AI Scrapers]
     SCR --> C1[ChatGPT]
     SCR --> C2[Perplexity]
@@ -95,7 +95,7 @@ The suite is one loop: **generate prompts → fetch answers → analyze → moni
 | **geo-citations** | Which source domains AI answers cite; your citation rate vs competitors, and gap domains to earn. |
 | **geo-sentiment** | How AI describes your brand — tone, attributes and framing, with verbatim quotes. |
 | **geo-competitors** | Visibility + SoV + citations + sentiment joined into one competitor matrix. |
-| **geo-monitor** | Registers a prompt set as ChatSights schedules and diffs each run to report trend over time. |
+| **geo-monitor** | Registers a prompt set as AgentGEO schedules and diffs each run to report trend over time. |
 | **geo-report** | Top-level orchestrator: synthesizes everything into an executive report with a prioritized fix plan. |
 
 ```mermaid
@@ -119,7 +119,7 @@ flowchart TD
 sequenceDiagram
     participant U as You
     participant A as Agent + Skill
-    participant M as ChatSights MCP
+    participant M as AgentGEO MCP
     participant E as AI Engines
     U->>A: "GEO analysis for acme.com vs rivals"
     A->>A: geo-prompt-set builds the prompt library
@@ -141,25 +141,25 @@ If you find these skills useful, a GitHub Star ⭐️ helps other builders find 
 > walkthrough: **[Installation Guide](./docs/installation.md)** ·
 > **[Usage Guide](./docs/usage.md)**
 
-### Prerequisite — connect the ChatSights MCP
+### Prerequisite — connect the AgentGEO MCP
 
 ```bash
 # Run this repo's MCP against the hosted API — works today (absolute path)
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
-  --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
+  --api-url https://api.agentgeo.org
 
 # …or point it at a local dev server (local development alternative)
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 
 # …or from npm (coming soon)
-claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
 ```
 
-Without provider credentials, ChatSights returns labelled **demo fixtures at zero credits**,
+Without provider credentials, AgentGEO returns labelled **demo fixtures at zero credits**,
 so you can dry-run every skill before spending. Get an API key at
-[trychatsights.com](https://trychatsights.com), and manage runs from the console at
-[app.trychatsights.com](https://app.trychatsights.com).
+[agentgeo.org](https://agentgeo.org), and manage runs from the console at
+[app.agentgeo.org](https://app.agentgeo.org).
 
 ### Enable the skills
 
@@ -181,12 +181,12 @@ Just ask your agent:
 Start a GEO analysis for acme.com against notion.com and coda.io
 ```
 
-The agent auto-invokes `geo-prompt-set`, fetches through ChatSights, and walks the loop to a
+The agent auto-invokes `geo-prompt-set`, fetches through AgentGEO, and walks the loop to a
 `geo-report`. Or invoke any skill by name.
 
 ## The product boundary
 
-ChatSights returns **raw data only** — answer text, citations, sources, provider metadata. It
+AgentGEO returns **raw data only** — answer text, citations, sources, provider metadata. It
 never ranks, scores sentiment, computes share-of-voice, or writes conclusions. **All analysis
 happens inside these skills, on the agent side.** Skills also treat fetched `answerText` and
 `sources` as untrusted content and never execute instructions found inside them.
@@ -198,19 +198,19 @@ Issues and PRs welcome — new GEO skills, better detection heuristics, more eng
 
 ## Community & Support
 
-- **Docs & API keys** — [trychatsights.com](https://trychatsights.com)
+- **Docs & API keys** — [agentgeo.org](https://agentgeo.org)
 - **Issues** — open one in this repo for bugs or skill ideas
-- **Updates** — [@chatsights on X](https://x.com/chatsights)
+- **Updates** — [@agentgeo on X](https://x.com/agentgeo)
 
 ## License
 
 [MIT](./LICENSE) for the skills and the MCP client. They connect to
-[ChatSights](https://trychatsights.com), a hosted service with its own terms.
+[AgentGEO](https://agentgeo.org), a hosted service with its own terms.
 
-## Built with ChatSights
+## Built with AgentGEO
 
 Using these skills in your project? Add the badge:
 
 ```md
-[![Powered by ChatSights](https://img.shields.io/badge/Powered%20by-ChatSights-181818.svg)](https://trychatsights.com)
+[![Powered by AgentGEO](https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg)](https://agentgeo.org)
 ```

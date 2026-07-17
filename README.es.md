@@ -1,13 +1,13 @@
 <div align="center">
 
-# ChatSights GEO Skills
+# AgentGEO GEO Skills
 
 **Convierte lo que los motores de IA realmente responden en decisiones de GEO — desde el lado del agente.**
 
 Un conjunto abierto de ocho Agent Skills + un servidor MCP sin dependencias. Tu agente de
 programación obtiene respuestas, citas y fuentes **reales** en seis superficies de IA — ChatGPT, Perplexity,
 Gemini, Google AI Overview, Google AI Mode y Copilot — a través de
-[ChatSights](https://trychatsights.com), y luego ejecuta el análisis de Generative Engine Optimization
+[AgentGEO](https://agentgeo.org), y luego ejecuta el análisis de Generative Engine Optimization
 de forma local.
 
 <p>
@@ -15,11 +15,11 @@ de forma local.
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
   <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
-  <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/Powered%20by-ChatSights-181818.svg" alt="Powered by ChatSights"></a>
+  <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
 <p>
-  <a href="https://x.com/chatsights"><img src="https://img.shields.io/badge/Follow%20on%20X-000000?logo=x&logoColor=white&style=for-the-badge" alt="Follow on X"></a>
-  <a href="https://trychatsights.com"><img src="https://img.shields.io/badge/trychatsights.com-181818?style=for-the-badge&logoColor=white" alt="trychatsights.com"></a>
+  <a href="https://x.com/agentgeo"><img src="https://img.shields.io/badge/Follow%20on%20X-000000?logo=x&logoColor=white&style=for-the-badge" alt="Follow on X"></a>
+  <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/agentgeo.org-181818?style=for-the-badge&logoColor=white" alt="agentgeo.org"></a>
 </p>
 
 <p>
@@ -35,19 +35,19 @@ de forma local.
 
 </div>
 
-## ChatSights GEO Skills
+## AgentGEO GEO Skills
 
 La mayoría de las herramientas de GEO inspeccionan *tu* HTML, robots.txt y schema, y **adivinan** si la IA puede verte.
 Estas skills leen lo que los motores de IA **realmente dicen** — así, la visibilidad, la cuota de voz,
 las citas y el sentimiento provienen de datos reales, no de inferencias.
 
-Los datos provienen de ChatSights, una fina capa de acceso sobre scrapers de IA gestionados. Devuelve
+Los datos provienen de AgentGEO, una fina capa de acceso sobre scrapers de IA gestionados. Devuelve
 **únicamente** respuestas en bruto, citas, fuentes y metadatos del proveedor. Cada puntuación, ranking y
 juicio de este repositorio lo calculan las skills, dentro de tu agente — nunca la plataforma.
 
 ### Cómo funciona
 
-Tu agente de programación accede a ChatSights mediante dos piezas de este repositorio:
+Tu agente de programación accede a AgentGEO mediante dos piezas de este repositorio:
 
 - **Servidor MCP** (`mcp/`) — expone una única herramienta acotada, `fetch_raw_answers`, que cualquier
   agente compatible con MCP (Claude Code, Cursor, Codex) puede invocar.
@@ -61,11 +61,11 @@ graph TB
         AG[AI Coding Agent · Claude Code / Cursor / Codex]
     end
     subgraph MID[" "]
-        SK[ChatSights GEO Skills]
+        SK[AgentGEO GEO Skills]
     end
     AG --> SK
-    SK -->|fetch_raw_answers| MCP[ChatSights MCP]
-    MCP -->|REST /v1/fetches| API[ChatSights API]
+    SK -->|fetch_raw_answers| MCP[AgentGEO MCP]
+    MCP -->|REST /v1/fetches| API[AgentGEO API]
     API --> SCR[Managed AI Scrapers]
     SCR --> C1[ChatGPT]
     SCR --> C2[Perplexity]
@@ -95,7 +95,7 @@ El conjunto es un único bucle: **generar prompts → obtener respuestas → ana
 | **geo-citations** | Qué dominios de origen citan las respuestas de IA; tu tasa de citas frente a la competencia, y dominios con brecha por conquistar. |
 | **geo-sentiment** | Cómo describe la IA tu marca — tono, atributos y encuadre, con citas textuales. |
 | **geo-competitors** | Visibilidad + SoV + citas + sentimiento combinados en una única matriz de competidores. |
-| **geo-monitor** | Registra un conjunto de prompts como programaciones de ChatSights y compara cada ejecución para informar de la tendencia a lo largo del tiempo. |
+| **geo-monitor** | Registra un conjunto de prompts como programaciones de AgentGEO y compara cada ejecución para informar de la tendencia a lo largo del tiempo. |
 | **geo-report** | Orquestador de alto nivel: sintetiza todo en un informe ejecutivo con un plan de correcciones priorizado. |
 
 ```mermaid
@@ -119,7 +119,7 @@ flowchart TD
 sequenceDiagram
     participant U as You
     participant A as Agent + Skill
-    participant M as ChatSights MCP
+    participant M as AgentGEO MCP
     participant E as AI Engines
     U->>A: "GEO analysis for acme.com vs rivals"
     A->>A: geo-prompt-set builds the prompt library
@@ -141,24 +141,24 @@ Si estas skills te resultan útiles, una Star ⭐️ en GitHub ayuda a que otros
 > recorrido de principio a fin: **[Guía de instalación](./docs/installation.md)** ·
 > **[Guía de uso](./docs/usage.md)**
 
-### Requisito previo — conecta el MCP de ChatSights
+### Requisito previo — conecta el MCP de AgentGEO
 
 ```bash
 # Run this repo's MCP against the hosted API — works today (absolute path)
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
-  --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
+  --api-url https://api.agentgeo.org
 
 # …or against a local dev backend (development alternative)
-claude mcp add chatsights -- node /absolute/path/to/chatsights-geo-skills/mcp/index.mjs \
+claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
   --api-url http://localhost:8080
 
 # …or from npm (coming soon)
-claude mcp add chatsights -- npx -y chatsights-mcp --api-url https://api.trychatsights.com
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
 ```
 
-Sin credenciales de proveedor, ChatSights devuelve **fixtures de demostración etiquetados con cero créditos**,
+Sin credenciales de proveedor, AgentGEO devuelve **fixtures de demostración etiquetados con cero créditos**,
 para que puedas probar en seco cada skill antes de gastar. Consigue una clave de API en
-[trychatsights.com](https://trychatsights.com).
+[agentgeo.org](https://agentgeo.org).
 
 ### Activa las skills
 
@@ -180,12 +180,12 @@ Simplemente pídeselo a tu agente:
 Start a GEO analysis for acme.com against notion.com and coda.io
 ```
 
-El agente invoca automáticamente `geo-prompt-set`, obtiene los datos a través de ChatSights y recorre el bucle hasta un
+El agente invoca automáticamente `geo-prompt-set`, obtiene los datos a través de AgentGEO y recorre el bucle hasta un
 `geo-report`. O invoca cualquier skill por su nombre.
 
 ## El límite del producto
 
-ChatSights devuelve **solo datos en bruto** — texto de respuesta, citas, fuentes y metadatos del proveedor. Nunca
+AgentGEO devuelve **solo datos en bruto** — texto de respuesta, citas, fuentes y metadatos del proveedor. Nunca
 clasifica, puntúa sentimiento, calcula cuota de voz ni redacta conclusiones. **Todo el análisis
 ocurre dentro de estas skills, en el lado del agente.** Las skills también tratan el `answerText` y las
 `sources` obtenidos como contenido no confiable y nunca ejecutan instrucciones halladas en su interior.
@@ -197,19 +197,19 @@ Se agradecen issues y PRs — nuevas skills de GEO, mejores heurísticas de dete
 
 ## Comunidad y soporte
 
-- **Documentación y claves de API** — [trychatsights.com](https://trychatsights.com)
+- **Documentación y claves de API** — [agentgeo.org](https://agentgeo.org)
 - **Issues** — abre uno en este repositorio para reportar errores o proponer ideas de skills
-- **Novedades** — [@chatsights en X](https://x.com/chatsights)
+- **Novedades** — [@agentgeo en X](https://x.com/agentgeo)
 
 ## Licencia
 
 [MIT](./LICENSE) para las skills y el cliente MCP. Se conectan a
-[ChatSights](https://trychatsights.com), un servicio alojado con sus propios términos.
+[AgentGEO](https://agentgeo.org), un servicio alojado con sus propios términos.
 
-## Hecho con ChatSights
+## Hecho con AgentGEO
 
 ¿Usas estas skills en tu proyecto? Añade el badge:
 
 ```md
-[![Powered by ChatSights](https://img.shields.io/badge/Powered%20by-ChatSights-181818.svg)](https://trychatsights.com)
+[![Powered by AgentGEO](https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg)](https://agentgeo.org)
 ```
