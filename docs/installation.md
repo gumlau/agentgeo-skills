@@ -68,10 +68,10 @@ claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs 
   --api-url http://localhost:8787 --key dev-placeholder
 ```
 
-Once the package is on npm, the `npx` form will work (**coming soon**):
+The package is published on npm, so the `npx` form works anywhere Node.js 18+ is installed:
 
 ```bash
-# coming soon — published npm package
+# published npm package
 claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 

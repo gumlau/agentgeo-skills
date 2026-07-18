@@ -151,7 +151,7 @@ claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs 
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
   --api-url http://localhost:8787 --key dev-placeholder
 
-# …或从 npm 运行(即将上线)
+# …或从 npm 运行(推荐——首次运行自动安装)
 claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
