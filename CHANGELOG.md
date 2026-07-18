@@ -6,6 +6,39 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-07-18
+
+npm publish of `agentgeo-mcp@0.3.1` is pending.
+
+### Fixed
+
+- **MCP**: HTTP 200 responses with non-JSON bodies are now reported as tool
+  errors instead of successes (`fetch_raw_answers` flags the parse failure and
+  returns the truncated body for debugging).
+
+### Changed
+
+- **Docs**: demo mode is documented as requiring an `ag_test_` test-scope key
+  (created under `/app/keys`) — the hosted API enforces Bearer auth on every
+  request, so there is no anonymous demo. `ag_live_` keys return live data and
+  spend credits.
+- Grammar/typo sweep (MCP tool description and docs).
+
+## [0.3.0] — 2026-07-16
+
+Published to npm as `agentgeo-mcp@0.3.0` (first npm release).
+
+### Added
+
+- **MCP**: `snapshot_id` argument on `fetch_raw_answers` — redeem a finished
+  async scrape instead of paying for a re-run.
+
+### Changed
+
+- **MCP**: fetch timeout raised to 180 s to cover slow live surfaces.
+- **MCP**: npm-valid `bin` path (no `./` prefix) so the bin entry survives
+  publish; `repository` field points at this public repo.
+
 ## [0.1.0] — 2026-07-16
 
 ### Added
@@ -23,5 +56,7 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - **Installation** and **Usage** guides under `docs/`.
 - Project docs: `CONTRIBUTING`, `CODE_OF_CONDUCT`, `SECURITY`, issue/PR templates.
 
-[Unreleased]: https://github.com/gumlau/agentgeo-skills/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/gumlau/agentgeo-skills/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/gumlau/agentgeo-skills/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/gumlau/agentgeo-skills/compare/v0.1.0...v0.3.0
 [0.1.0]: https://github.com/gumlau/agentgeo-skills/releases/tag/v0.1.0

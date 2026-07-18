@@ -12,7 +12,7 @@
  */
 
 /** Keep in lockstep with package.json "version". */
-const VERSION = "0.3.0";
+const VERSION = "0.3.1";
 
 /** Mirrors worker/src/routes/meta.ts: SUPPORTED_SURFACES (same keys, same order). */
 const SURFACES = [
@@ -92,7 +92,7 @@ const fetchTool = {
   name: "fetch_raw_answers",
   title: "Fetch raw AI answers",
   description:
-    "Fetch raw answer text, citations, and provider metadata through AgentGEO' managed AI scrapers. Returns no ranking, sentiment, visibility score, or other analysis.",
+    "Fetch raw answer text, citations, and provider metadata through AgentGEO's managed AI scrapers. Returns no ranking, sentiment, visibility score, or other analysis.",
   inputSchema: {
     type: "object",
     additionalProperties: false,
@@ -164,13 +164,17 @@ async function callFetchTool(id, args) {
     });
     const text = await response.text();
     let payload;
+    let parseFailed = false;
     try {
       payload = JSON.parse(text);
     } catch {
-      payload = { detail: text || `AgentGEO returned HTTP ${response.status}` };
+      // A non-JSON body is never a valid fetch result, even on HTTP 200.
+      parseFailed = true;
+      payload = { detail: `AgentGEO returned a non-JSON HTTP ${response.status} response` };
+      if (text) payload.body = text.slice(0, 2000);
     }
 
-    if (!response.ok) {
+    if (!response.ok || parseFailed) {
       result(id, {
         isError: true,
         content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],

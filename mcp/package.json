@@ -1,6 +1,6 @@
 {
   "name": "agentgeo-mcp",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Zero-dependency MCP stdio server exposing one tool: fetch raw AI answer records (answer text, sources, provider metadata) from the AgentGEO API. No ranking, sentiment, or scoring.",
   "keywords": [
     "mcp",
