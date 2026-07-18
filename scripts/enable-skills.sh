@@ -5,7 +5,7 @@
 #   ./scripts/enable-skills.sh --global   # every project      -> ~/.claude/skills
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
 
 if [ "${1:-}" = "--global" ]; then
   DEST="$HOME/.claude/skills"
