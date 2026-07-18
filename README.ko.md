@@ -1,5 +1,7 @@
 <div align="center">
 
+<a href="https://agentgeo.org"><img src="./assets/logo.png" alt="AgentGEO logo" width="88"></a>
+
 # AgentGEO GEO Skills
 
 **AI 엔진이 실제로 답변하는 내용을 GEO 의사결정으로 바꾸세요 — 에이전트 측에서.**

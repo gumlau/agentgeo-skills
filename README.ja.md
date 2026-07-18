@@ -1,5 +1,7 @@
 <div align="center">
 
+<a href="https://agentgeo.org"><img src="./assets/logo.png" alt="AgentGEO logo" width="88"></a>
+
 # AgentGEO GEO Skills
 
 **AI エンジンが実際に返す答えを、GEO の意思決定へ — エージェント側で。**
