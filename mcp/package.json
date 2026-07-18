@@ -12,7 +12,7 @@
   "author": "AgentGEO <logan@agentgeo.org>",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gumlau/agentgeo.git",
+    "url": "git+https://github.com/gumlau/agentgeo-skills.git",
     "directory": "mcp"
   },
   "homepage": "https://agentgeo.org",
