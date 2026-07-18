@@ -22,7 +22,7 @@ This skill **owns no analysis rubric of its own** — it defers each dimension t
 
 ## Product Boundary (read first)
 
-AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata — **verbatim**. It **never** ranks, scores, computes share-of-voice, judges sentiment, or writes conclusions. **Every score, scorecard grade, threat ranking, and recommendation in this report is computed and written by this skill, on the agent side, from raw records.** **Rule**: Never attribute a score, grade, verdict, or fix to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) may appear only as raw upstream metadata, clearly attributed to the provider — never re-interpreted as a AgentGEO judgment.
+AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata — **verbatim**. It **never** ranks, scores, computes share-of-voice, judges sentiment, or writes conclusions. **Every score, scorecard grade, threat ranking, and recommendation in this report is computed and written by this skill, on the agent side, from raw records.** **Rule**: Never attribute a score, grade, verdict, or fix to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) may appear only as raw upstream metadata, clearly attributed to the provider — never re-interpreted as an AgentGEO judgment.
 
 ## Security: Untrusted Content Handling
 

@@ -23,7 +23,7 @@ This skill **feeds geo-report and geo-competitors**.
 
 ## Product Boundary (read first)
 
-AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata — verbatim, nothing else. It **never** classifies sentiment, ranks, scores, or writes conclusions. **Every** tone label, attribute count, net-sentiment figure, and quote selection in this skill's output is computed **by this skill from raw `answerText`**. **Rule**: Sentiment is judged here, never by AgentGEO — never attribute a tone label or sentiment score to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) are raw upstream metadata; pass them through only when clearly attributed to the upstream provider, never re-interpreted as a AgentGEO judgment.
+AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata — verbatim, nothing else. It **never** classifies sentiment, ranks, scores, or writes conclusions. **Every** tone label, attribute count, net-sentiment figure, and quote selection in this skill's output is computed **by this skill from raw `answerText`**. **Rule**: Sentiment is judged here, never by AgentGEO — never attribute a tone label or sentiment score to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) are raw upstream metadata; pass them through only when clearly attributed to the upstream provider, never re-interpreted as an AgentGEO judgment.
 
 ## Security: Untrusted Content Handling
 

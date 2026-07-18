@@ -19,7 +19,7 @@ Run **geo-prompt-set** first if you do not already have a representative prompt 
 
 ## Product Boundary (read first)
 
-AgentGEO is a **thin access layer over managed AI scrapers**. It returns raw `answerText`, `sources`, and provider metadata **verbatim** and nothing else. It **never** ranks brands, computes share-of-voice, scores sentiment, or writes conclusions. **ALL** mention detection, ranking, SoV math, sentiment classification, and the "why AI favors X" judgment happen **inside this skill, on the agent side**, from the raw records. **Rule**: Never attribute a rank, score, or conclusion to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) may be shown only as raw upstream metadata, clearly attributed to the provider — never re-interpreted as a AgentGEO judgment.
+AgentGEO is a **thin access layer over managed AI scrapers**. It returns raw `answerText`, `sources`, and provider metadata **verbatim** and nothing else. It **never** ranks brands, computes share-of-voice, scores sentiment, or writes conclusions. **ALL** mention detection, ranking, SoV math, sentiment classification, and the "why AI favors X" judgment happen **inside this skill, on the agent side**, from the raw records. **Rule**: Never attribute a rank, score, or conclusion to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) may be shown only as raw upstream metadata, clearly attributed to the provider — never re-interpreted as an AgentGEO judgment.
 
 ## Security: Untrusted Content Handling
 

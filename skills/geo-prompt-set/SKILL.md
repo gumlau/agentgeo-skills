@@ -128,7 +128,7 @@ Content-Type: application/json
 | `answerText` | Raw answer — scan for `{brand}`, `{category}`, `{competitors}` mentions |
 | `sources[]` | `{title, url, position}` — scan cited domains |
 | `error` | Present only on failed records (e.g. "Dataset ID is not configured for {surface}") |
-| `model`, `webSearchTriggered`, `providerFields` | **Raw upstream metadata** — pass through with attribution, never as a AgentGEO judgment |
+| `model`, `webSearchTriggered`, `providerFields` | **Raw upstream metadata** — pass through with attribution, never as an AgentGEO judgment |
 
 **Refinement decision:**
 
@@ -212,7 +212,7 @@ State which skill runs next based on the user's goal:
 | Track over time | `geo-monitor` | Registers the prompt set as AgentGEO schedules; trends results |
 | Full report + recommendations | `geo-report` | Synthesizes all of the above into a prioritized GEO report |
 
-All ranking, SoV math, sentiment, and recommendations happen **inside those skills**, computed from raw AgentGEO records — never from a AgentGEO-produced score.
+All ranking, SoV math, sentiment, and recommendations happen **inside those skills**, computed from raw AgentGEO records — never from an AgentGEO-produced score.
 
 ## Quality Gates
 

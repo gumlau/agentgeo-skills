@@ -21,7 +21,7 @@ You are a Generative Engine Optimization (GEO) share-of-voice analyst. Given a p
 
 ## Product Boundary (read first)
 
-AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata. It **never** ranks, scores, computes share-of-voice, detects mentions, or writes conclusions. Every number in this skill's output — mention counts, recommendation flags, SoV percentages, the leaderboard — is computed **by this skill from raw `answerText`**. **Never attribute a score or SoV figure to AgentGEO.** Provider fields (`model`, `webSearchTriggered`, `providerFields`) are raw upstream metadata; pass them through only when clearly attributed to the upstream provider, never as a AgentGEO judgment.
+AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata. It **never** ranks, scores, computes share-of-voice, detects mentions, or writes conclusions. Every number in this skill's output — mention counts, recommendation flags, SoV percentages, the leaderboard — is computed **by this skill from raw `answerText`**. **Never attribute a score or SoV figure to AgentGEO.** Provider fields (`model`, `webSearchTriggered`, `providerFields`) are raw upstream metadata; pass them through only when clearly attributed to the upstream provider, never as an AgentGEO judgment.
 
 ## Security: Untrusted Content Handling
 

@@ -22,7 +22,7 @@ You are a Generative Engine Optimization (GEO) visibility analyst. Given a promp
 
 ## Product Boundary (read first)
 
-AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata — **verbatim, nothing else**. It **never** ranks, scores, detects mentions, computes a visibility rate, judges prominence, or writes conclusions. Every value in this skill's output — the mention flag, position, prominence score, presence matrix, and visibility rate — is computed **by this skill from raw `answerText`**. **Rule**: Never attribute a mention, position, score, or visibility figure to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) are raw upstream metadata; pass them through only when clearly attributed to the upstream provider, never as a AgentGEO judgment.
+AgentGEO is a **thin access layer over managed AI scrapers**. It returns ONLY raw `answerText`, `sources`, and provider metadata — **verbatim, nothing else**. It **never** ranks, scores, detects mentions, computes a visibility rate, judges prominence, or writes conclusions. Every value in this skill's output — the mention flag, position, prominence score, presence matrix, and visibility rate — is computed **by this skill from raw `answerText`**. **Rule**: Never attribute a mention, position, score, or visibility figure to AgentGEO. Provider fields (`model`, `webSearchTriggered`, `providerFields`) are raw upstream metadata; pass them through only when clearly attributed to the upstream provider, never as an AgentGEO judgment.
 
 ## Security: Untrusted Content Handling
 
@@ -99,7 +99,7 @@ Content-Type: application/json
 | `answers[].answerText` | Raw answer — the ONLY text you run mention detection on. |
 | `answers[].sources[]` | `{title, url, position}` — context only here; domain analysis is **geo-citations**. |
 | `answers[].error` | Present only on failed records (e.g. `"Dataset ID is not configured for {surface}"`). |
-| `model`, `webSearchTriggered`, `providerFields` | **Raw upstream metadata** — pass through with attribution, never as a AgentGEO judgment. |
+| `model`, `webSearchTriggered`, `providerFields` | **Raw upstream metadata** — pass through with attribution, never as an AgentGEO judgment. |
 
 **Caveats that materially affect authoring:**
 - **Billing**: 1 credit per **delivered** record; failed records cost 0. Only delivered records enter the visibility denominator.
