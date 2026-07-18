@@ -19,7 +19,7 @@
   "private": false,
   "type": "module",
   "bin": {
-    "agentgeo-mcp": "./index.mjs"
+    "agentgeo-mcp": "index.mjs"
   },
   "files": [
     "index.mjs",
