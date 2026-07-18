@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  mcp:
+    name: MCP server
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Syntax check
+        run: node --check mcp/index.mjs
+
+      - name: Version lockstep (index.mjs VERSION == package.json version)
+        run: |
+          node -e '
+            const fs = require("fs");
+            const src = fs.readFileSync("mcp/index.mjs", "utf8");
+            const m = src.match(/^const VERSION = "([^"]+)";/m);
+            if (!m) { console.error("VERSION const not found in mcp/index.mjs"); process.exit(1); }
+            const pkg = JSON.parse(fs.readFileSync("mcp/package.json", "utf8"));
+            if (m[1] !== pkg.version) {
+              console.error(`version mismatch: mcp/index.mjs has ${m[1]}, mcp/package.json has ${pkg.version}`);
+              process.exit(1);
+            }
+            console.log(`version lockstep OK: ${m[1]}`);
+          '
+
+      - name: Stdio protocol smoke (initialize + tools/list)
+        run: |
+          printf '%s\n' \
+            '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"ci","version":"0"}}}' \
+            '{"jsonrpc":"2.0","id":2,"method":"tools/list"}' \
+            | node mcp/index.mjs --key ci-smoke > smoke-out.jsonl
+          grep -q 'agentgeo-mcp' smoke-out.jsonl
+          grep -q 'fetch_raw_answers' smoke-out.jsonl
+          echo "stdio smoke OK"
+
+      - name: Fails fast without an API key
+        run: |
+          if node mcp/index.mjs </dev/null >/dev/null 2>&1; then
+            echo "::error::server should exit non-zero when no API key is provided"
+            exit 1
+          fi
+          echo "no-key exit check OK"
+
+  enable-skills:
+    name: enable-skills.sh (bash, sh, zsh)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install zsh
+        run: sudo apt-get update && sudo apt-get install -y zsh
+
+      - name: Run script under each shell and count symlinks
+        run: |
+          for shell in bash sh zsh; do
+            tmp="$(mktemp -d)"
+            ( cd "$tmp" && "$shell" "$GITHUB_WORKSPACE/scripts/enable-skills.sh" )
+            count="$(find "$tmp/.claude/skills" -maxdepth 1 -type l | wc -l | tr -d ' ')"
+            if [ "$count" -ne 8 ]; then
+              echo "::error::expected 8 symlinks in .claude/skills under $shell, got $count"
+              exit 1
+            fi
+            echo "$shell: 8 symlinks OK"
+            rm -rf "$tmp"
+          done
+
+  docs-links:
+    name: Markdown relative links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check relative links in all tracked *.md files
+        run: |
+          node - <<'EOF'
+          const { execSync } = require("node:child_process");
+          const { existsSync, readFileSync } = require("node:fs");
+          const { dirname, join } = require("node:path");
+
+          const files = execSync("git ls-files '*.md'", { encoding: "utf8" })
+            .split("\n")
+            .filter(Boolean);
+          const broken = [];
+          const linkRe = /!?\[[^\]]*\]\(\s*<?([^)<>\s]+)>?(?:\s+["'][^)]*)?\)/g;
+
+          for (const file of files) {
+            const text = readFileSync(file, "utf8");
+            for (const match of text.matchAll(linkRe)) {
+              let target = match[1];
+              if (/^(https?:|mailto:)/i.test(target)) continue; // external
+              if (target.startsWith("#")) continue; // pure anchor
+              target = target.split("#")[0].replace(/\/+$/, ""); // strip fragment + trailing slash
+              if (!target) continue;
+              try { target = decodeURIComponent(target); } catch {}
+              const resolved = join(dirname(file), target);
+              if (!existsSync(resolved)) broken.push(`${file}: ${match[1]} -> ${resolved}`);
+            }
+          }
+
+          if (broken.length) {
+            console.error(`Broken relative links (${broken.length}):`);
+            for (const b of broken) console.error(`  ${b}`);
+            process.exit(1);
+          }
+          console.log(`docs-links OK: ${files.length} markdown files checked`);
+          EOF
