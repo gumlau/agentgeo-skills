@@ -3,9 +3,14 @@
 #
 #   ./scripts/enable-skills.sh            # this project only  -> ./.claude/skills
 #   ./scripts/enable-skills.sh --global   # every project      -> ~/.claude/skills
-set -euo pipefail
+# -eu only: dash (Ubuntu's sh) has no pipefail, and this script has no
+# pipelines whose failure could otherwise slip through.
+set -eu
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)"
+# ${BASH_SOURCE:-$0}, unsubscripted: bash resolves it to BASH_SOURCE[0]; dash
+# and zsh (no BASH_SOURCE) fall back to $0. The [0] form is a dash "Bad
+# substitution" that silently yields an empty ROOT.
+ROOT="$(cd "$(dirname "${BASH_SOURCE:-$0}")/.." && pwd)"
 
 if [ "${1:-}" = "--global" ]; then
   DEST="$HOME/.claude/skills"
