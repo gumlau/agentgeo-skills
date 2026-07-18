@@ -156,9 +156,12 @@ claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs 
 claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
-제공자 자격 증명이 없어도 AgentGEO는 라벨이 붙은 **데모 픽스처를 크레딧 소모 없이** 반환하므로,
-비용을 쓰기 전에 모든 스킬을 드라이런할 수 있습니다. API 키는
-[agentgeo.org](https://agentgeo.org)에서 받으세요.
+API 키는 필수입니다 — 키가 없으면 서버가 그대로 종료됩니다. [agentgeo.org](https://agentgeo.org)에서
+무료로 발급받으세요. **`ag_test_...` 테스트 키**를 쓰면 모든 페치가 **크레딧 소모 없이 데모 모드**로
+실행되므로(라벨이 붙은 데모 픽스처 반환), 비용을 쓰기 전에 모든 스킬을 드라이런할 수 있습니다.
+**`ag_live_...` 키**는 실제 응답을 반환합니다. 키와 실행 내역은
+[app.agentgeo.org](https://app.agentgeo.org) 콘솔에서 관리하세요. 인증을 끈 셀프 호스팅 서버는
+아무 자리표시자 키나 허용합니다.
 
 ### 스킬 활성화
 

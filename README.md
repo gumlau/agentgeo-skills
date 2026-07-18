@@ -158,10 +158,12 @@ claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs 
 claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
-Without provider credentials, AgentGEO returns labelled **demo fixtures at zero credits**,
-so you can dry-run every skill before spending. Get an API key at
-[agentgeo.org](https://agentgeo.org), and manage runs from the console at
-[app.agentgeo.org](https://app.agentgeo.org).
+A key is required — the server exits without one. Get one free at
+[agentgeo.org](https://agentgeo.org): an **`ag_test_...` test key** runs every fetch in
+**demo mode at zero credits** (labelled fixtures), so you can dry-run every skill before
+spending; an **`ag_live_...` key** returns live answers. Manage keys and runs from the
+console at [app.agentgeo.org](https://app.agentgeo.org). Self-hosted servers with auth
+disabled accept any placeholder key.
 
 ### Enable the skills
 

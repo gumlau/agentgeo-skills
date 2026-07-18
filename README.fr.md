@@ -160,9 +160,13 @@ claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs 
 claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
-Sans identifiants de fournisseur, AgentGEO renvoie des **jeux de démonstration étiquetés, sans consommer de crédits**,
-ce qui vous permet de tester chaque skill à blanc avant de dépenser. Obtenez une clé API sur
-[agentgeo.org](https://agentgeo.org).
+Une clé est obligatoire — sans elle, le serveur s'arrête aussitôt. Obtenez-en une gratuitement sur
+[agentgeo.org](https://agentgeo.org) : une **clé de test `ag_test_...`** exécute chaque fetch en
+**mode démo, sans consommer de crédits** (jeux de démonstration étiquetés), ce qui vous permet de
+tester chaque skill à blanc avant de dépenser ; une **clé `ag_live_...`** renvoie des réponses
+réelles. Gérez vos clés et vos exécutions depuis la console sur
+[app.agentgeo.org](https://app.agentgeo.org). Les serveurs auto-hébergés dont l'authentification
+est désactivée acceptent n'importe quelle clé factice.
 
 ### Activer les skills
 

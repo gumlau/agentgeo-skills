@@ -155,9 +155,11 @@ claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs 
 claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
-在没有 provider 凭证时,AgentGEO 会返回带标注的**演示数据(demo fixtures),零 credit 消耗**,
-让你在花钱之前先把每个 skill 跑通。到 [agentgeo.org](https://agentgeo.org) 获取 API key,
-并在 [app.agentgeo.org](https://app.agentgeo.org) 的控制台里管理它们。
+必须提供 API key —— 没有 key 时服务器会直接退出。到 [agentgeo.org](https://agentgeo.org) 免费获取:
+**`ag_test_...` 测试 key** 会让每一次抓取都以**演示模式运行,零 credit 消耗**(返回带标注的演示数据),
+让你在花钱之前先把每个 skill 跑通;**`ag_live_...` key** 则返回真实的实时回答。
+在 [app.agentgeo.org](https://app.agentgeo.org) 的控制台里管理 key 和运行记录。
+自建服务器在关闭鉴权后,可接受任意占位 key。
 
 ### 启用这些 skill
 

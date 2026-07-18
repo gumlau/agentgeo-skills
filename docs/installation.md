@@ -17,7 +17,7 @@ Engine Optimization math locally.
 | **Node.js ≥ 18** | The MCP server (`mcp/index.mjs`) uses built-in `fetch` and `AbortSignal.timeout`, both stable in Node 18+. Zero npm dependencies. | `node --version` |
 | **A coding agent / MCP client** | Runs the skills and calls the MCP tool. Claude Code, Cursor, and Codex are supported out of the box; any stdio MCP client works. | Open your agent |
 | **This repo, cloned locally** | The MCP entry point and the skills both live here. | `ls mcp/index.mjs skills/` |
-| **(Optional) A AgentGEO API key** | Only needed for **live** data. Demo mode works with no key. | See [Step 2](#step-2--api-key--modes) |
+| **An AgentGEO API key** | Required — the MCP server exits without one. A free `ag_test_...` key = zero-credit demo runs; `ag_test_` vs `ag_live_` decides the mode. | See [Step 2](#step-2--api-key--modes) |
 
 ```bash
 # Verify Node and locate the repo
@@ -45,7 +45,7 @@ variables**, in this order:
 | Setting | Flag | Env var | Default |
 |---------|------|---------|---------|
 | API base URL | `--api-url <url>` | `AGENTGEO_API_URL` | `https://api.agentgeo.org` |
-| API key | `--key <ag_live_...>` | `AGENTGEO_API_KEY` | *(empty → demo mode)* |
+| API key | `--key <ag_live_...>` | `AGENTGEO_API_KEY` | *(required — the server exits if missing)* |
 
 The server calls `POST <api-url>/v1/fetches`. A trailing slash on `--api-url` is
 stripped automatically.
@@ -152,7 +152,7 @@ instead of flags — handy when the client doesn't let you pass args:
 
 ```bash
 export AGENTGEO_API_URL="https://api.agentgeo.org"
-export AGENTGEO_API_KEY="ag_live_..."     # omit for demo mode
+export AGENTGEO_API_KEY="ag_live_..."     # use ag_test_... for demo mode
 node /absolute/path/to/agentgeo-skills/mcp/index.mjs
 ```
 
@@ -162,31 +162,33 @@ Flags win over env vars if you set both.
 
 ## Step 2 — API key & modes
 
-The MCP server runs in one of two modes, decided entirely by whether it has a key.
+The MCP server runs in one of two modes, decided entirely by which kind of key it has.
 
-| Mode | Key present? | What you get | Cost |
+| Mode | Key type | What you get | Cost |
 |------|--------------|--------------|------|
-| **Demo** | No `--key` and no `AGENTGEO_API_KEY` | Labelled demo **fixtures** — real answer/citation *shape*, so every skill runs end to end | **0 credits** |
-| **Live** | Yes | Real answers, citations, and sources from the six AI surfaces | Spends credits |
+| **Demo** | `ag_test_...` test-scope key — or any placeholder key on a self-hosted server with auth disabled | Labelled demo **fixtures** — real answer/citation *shape*, so every skill runs end to end | **0 credits** |
+| **Live** | `ag_live_...` key | Real answers, citations, and sources from the six AI surfaces | Spends credits |
 
 ### Demo mode (default — start here)
 
-Do nothing. With no key configured, AgentGEO returns labelled demo fixtures at
-**zero credits**, so you can dry-run every skill and confirm the whole loop works
-before you spend anything.
+1. Create a free account at **[agentgeo.org](https://agentgeo.org)** and create a
+   key with scope **test** under **API keys** (`/app/keys`).
+2. Pass it via `--key ag_test_...` (or `AGENTGEO_API_KEY`). Every run is labelled
+   `mode: "demo"` and costs 0 credits.
 
 ```bash
-# Demo mode — no key, zero credits
+# Demo mode — test-scope key, zero credits
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url https://api.agentgeo.org --key ag_live_...
+  --api-url https://api.agentgeo.org --key ag_test_...
 ```
 
 ### Live mode
 
 1. Get a key at **[agentgeo.org](https://agentgeo.org)**. Keys are created
    in the console under **API keys** (`/app/keys`).
-2. **Creating your first key turns auth enforcement on.** After that, requests
-   without a valid key are rejected (`401`).
+2. **The hosted API requires a valid key on every request** — there is no
+   anonymous access; requests without one are rejected (`401`). `ag_live_...`
+   keys return live data; `ag_test_...` keys stay in free demo mode.
 3. Pass the key via `--key` or `AGENTGEO_API_KEY`, and point `--api-url` at the
    hosted API.
 
@@ -315,8 +317,8 @@ Each entry should be a symlink (`geo-* -> …/skills/geo-*`). In your agent, the
 | Agent says the **MCP / tool isn't found**; `fetch_raw_answers` unavailable | Server not registered, or the agent wasn't reloaded | Re-run the `claude mcp add …` (or edit the client config) and restart the agent. Verify with `claude mcp list`. |
 | **`node: command not found`** or the server won't start | Node missing or too old | Install Node ≥ 18; confirm with `node --version`. |
 | **`Cannot find module …/index.mjs`** / server exits immediately | Relative or wrong path in the config | Use the **absolute** path from `pwd`. Confirm `ls /absolute/path/to/agentgeo-skills/mcp/index.mjs` succeeds. |
-| **`401 Unauthorized`** in the fetch response | Auth is on (a key exists) but yours is missing or wrong | Pass `--key ag_live_...` or set `AGENTGEO_API_KEY`. Remember: creating the first key at `/app/keys` turns auth on for the workspace. |
-| **`402 Payment Required`** / spend-cap message | Credit balance or spend cap reached in live mode | Top up / raise the cap in the console, or drop the key to fall back to free **demo mode**. |
+| **`401 Unauthorized`** in the fetch response | Your key is missing, malformed, or invalid — the hosted API requires a valid Bearer key on every request | Pass `--key ag_live_...` (or an `ag_test_...` demo key) or set `AGENTGEO_API_KEY`. Create keys in the console at `/app/keys`. |
+| **`402 Payment Required`** / spend-cap message | Credit balance or spend cap reached in live mode | Top up / raise the cap in the console, or switch to an `ag_test_...` key to fall back to free **demo mode**. |
 | **`AgentGEO API is unavailable at http://localhost:8787`** | No API listening at the `--api-url` target | Start the local API, or point `--api-url` / `AGENTGEO_API_URL` at the hosted URL (`https://api.agentgeo.org`). |
 | Skills **don't appear** in the agent | `enable-skills.sh` not run, or wrong scope | Run `./scripts/enable-skills.sh` (project) or `--global`; then `ls -l .claude/skills/` should show 8 symlinks. |
 | **`Invalid fetch_raw_answers arguments`** | Empty `query`, empty `surfaces`, or an unsupported surface name | Send a non-empty `query` and at least one surface from: `chatgpt`, `perplexity`, `gemini`, `google_ai_overview`, `google_ai_mode`, `copilot`. |

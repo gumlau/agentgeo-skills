@@ -185,7 +185,7 @@ The report closes with a `GEO-REPORT-META` block that `geo-monitor` uses to tren
 | **geo-report** | "Put it all together + tell me what to fix." | Prompt set + sibling outputs | Verdict, composite score, scorecard, threats, fix plan, evidence appendix + `GEO-REPORT-META` | Orchestrates all; → geo-monitor |
 
 All ranking, SoV math, sentiment, citation, and trend logic runs **inside these skills**,
-computed from raw AgentGEO records — never from a AgentGEO-produced score.
+computed from raw AgentGEO records — never from an AgentGEO-produced score.
 
 ---
 
@@ -240,9 +240,10 @@ crossing a threshold, the skill replies `[SILENT]` to suppress no-news notificat
   set across 4 surfaces at 3 runs each = up to `12 × 4 × 3 = 144` records.
 - **Failed records cost 0** and are excluded from every denominator (never counted as a zero).
   Unconfigured Google AI Overview / AI Mode SERP zones commonly fail — that's free.
-- **Demo mode is free.** Without provider credentials, fetches return labelled demo fixtures at
-  **zero credits** (`mode: "demo"`). Dry-run every skill before spending — but never treat demo
-  answers as real; skills label such output `DEMO` and stop before conclusions.
+- **Demo mode is free.** An `ag_test_...` key (or a self-hosted server without provider
+  credentials) returns labelled demo fixtures at **zero credits** (`mode: "demo"`). Dry-run
+  every skill before spending — but never treat demo answers as real; skills label such output
+  `DEMO` and stop before conclusions.
 
 **Tips for trustworthy numbers:**
 

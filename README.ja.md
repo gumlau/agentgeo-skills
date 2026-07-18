@@ -146,7 +146,7 @@ claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs 
 claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
-プロバイダーの認証情報がなくても、AgentGEO はラベル付きの**デモフィクスチャをクレジット消費ゼロで**返します。そのため、費用をかける前にすべてのスキルをドライランで試せます。API キーは [agentgeo.org](https://agentgeo.org) で取得してください。
+API キーは必須です — キーがないとサーバーはそのまま終了します。[agentgeo.org](https://agentgeo.org) で無料で取得できます。**`ag_test_...` テストキー**を使うと、すべてのフェッチが**デモモード・クレジット消費ゼロ**で実行される(ラベル付きのデモフィクスチャが返る)ため、費用をかける前にすべてのスキルをドライランで試せます。**`ag_live_...` キー**は実際の回答を返します。キーと実行履歴は [app.agentgeo.org](https://app.agentgeo.org) のコンソールで管理できます。認証を無効化したセルフホストサーバーでは、任意のプレースホルダーキーが使えます。
 
 ### スキルを有効化する
 
