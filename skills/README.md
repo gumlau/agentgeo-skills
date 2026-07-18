@@ -49,11 +49,11 @@ Every skill fetches through AgentGEO. Connect the MCP once (absolute path in a r
 
 ```bash
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url http://localhost:8080
+  --api-url https://api.agentgeo.org --key ag_test_...
 ```
 
-Without provider credentials the fetches return labelled demo fixtures at zero credits, so you
-can dry-run every skill before spending. See the repo root `README.md` for live provider setup.
+An `ag_test_...` key returns labelled demo fixtures at zero credits, so you can dry-run every
+skill before spending. See the repo root `README.md` for live setup.
 
 ## Enabling the skills
 
@@ -66,6 +66,7 @@ mkdir -p .claude/skills
 for d in skills/geo-*/; do ln -sfn "$(pwd)/$d" ".claude/skills/$(basename "$d")"; done
 
 # …or enable globally for all your projects:
+mkdir -p "$HOME/.claude/skills"
 for d in skills/geo-*/; do ln -sfn "$(pwd)/$d" "$HOME/.claude/skills/$(basename "$d")"; done
 ```
 

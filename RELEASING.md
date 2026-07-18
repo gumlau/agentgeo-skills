@@ -39,7 +39,7 @@ The GitHub Actions workflow publishes with a token, so no local `npm login` is n
 
    ```bash
    npm view agentgeo-mcp version
-   npx -y agentgeo-mcp --api-url http://localhost:8080   # smoke test
+   npx -y agentgeo-mcp --version   # smoke test (no key needed)
    ```
 
 You can also run the workflow by hand from the **Actions** tab (**Run workflow**).
