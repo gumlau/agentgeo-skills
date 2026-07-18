@@ -3,7 +3,7 @@
 MCP stdio server for [AgentGEO](https://agentgeo.org). It exposes one
 deliberately narrow tool, `fetch_raw_answers`: fetch raw AI answer records
 (answer text, source citations, provider metadata) from ChatGPT, Perplexity,
-Gemini, Google AI Overview, Google AI Mode, and Copilot through AgentGEO'
+Gemini, Google AI Overview, Google AI Mode, and Copilot through AgentGEO's
 managed scrapers.
 
 It returns provider records unchanged — no rankings, sentiment, visibility
@@ -13,16 +13,16 @@ Zero npm dependencies; Node.js 18+ built-ins only.
 
 ## Install & run
 
-Once published to npm, no install step is needed:
+No install step is needed — `npx` fetches it from npm on first run:
 
 ```bash
 npx -y agentgeo-mcp --key ag_live_...
 ```
 
-Or run it straight from a clone of the product repo (the current form):
+Or run it straight from a clone of this repo:
 
 ```bash
-node /absolute/path/to/agentgeo/mcp/index.mjs --key ag_live_...
+node /absolute/path/to/agentgeo-skills/mcp/index.mjs --key ag_live_...
 ```
 
 The server speaks MCP over stdio — register it with a client rather than
@@ -60,7 +60,7 @@ Cursor — add to `~/.cursor/mcp.json` (or `.cursor/mcp.json` in a project):
 ```
 
 From a repo clone instead of npm, replace `npx -y agentgeo-mcp` with
-`node /absolute/path/to/agentgeo/mcp/index.mjs` in any of the above.
+`node /absolute/path/to/agentgeo-skills/mcp/index.mjs` in any of the above.
 
 ## The tool
 
@@ -89,8 +89,9 @@ Each per-surface record in `answers` carries `surfaceKey`, `status`
 ## Credits
 
 One successfully **delivered** record costs one credit; failed records cost
-zero. Without provider credentials configured on the server, fetches return
-clearly labelled demo records at zero credits.
+zero. Demo-mode runs — an `ag_test_...` key on the hosted API, or a
+self-hosted server without provider credentials — return clearly labelled
+demo records at zero credits.
 
 ## License
 
