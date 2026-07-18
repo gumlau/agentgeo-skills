@@ -263,6 +263,11 @@ MCP, and walks the loop to a `geo-report`. You can also call any skill by name.
 
 ## Verify
 
+### 0. One-command check
+
+Run `./scripts/verify-install.sh` from the repo root — it checks Node, the MCP server file, the stdio handshake, and the linked skills in one pass.
+Add `--fetch` (with `AGENTGEO_API_KEY` set; `ag_test_...` = free demo mode) to also send a single real `fetch_raw_answers` call and report the delivered mode. Prefer the manual route? The steps below cover the same ground.
+
 ### 1. Smoke-test the MCP tool
 
 Ask your agent to run a minimal `fetch_raw_answers` call:
@@ -281,21 +286,28 @@ the skills. In demo mode the records are clearly labelled as fixtures, and you s
 
 ```json
 {
+  "id": "run_demo_…",
   "query": "best project management tool",
-  "results": [
+  "surfaces": ["chatgpt"],
+  "mode": "demo",
+  "status": "completed",
+  "recordsDelivered": 1,
+  "creditsCharged": 0,
+  "answers": [
     {
-      "surface": "chatgpt",
+      "surfaceKey": "chatgpt",
+      "status": "delivered",
       "answerText": "…demo fixture answer text…",
-      "citations": [ { "title": "…", "url": "https://…" } ],
-      "sources": [ "https://…" ],
-      "provider": { "mode": "demo", "country": "US", "language": "en" }
+      "sources": [ { "title": "…", "url": "https://…", "position": 1 } ],
+      "providerRecordId": "demo_chatgpt_1",
+      "providerFields": { "source": "local_demo_fixture" }
     }
   ]
 }
 ```
 
-Exact field names come from the AgentGEO API; the point is that you get **raw
-records back and no error**.
+The run envelope carries a top-level `mode` and one record per surface in
+`answers[]`; the point is that you get **raw records back and no error**.
 
 ### 2. Confirm the skills are picked up
 
