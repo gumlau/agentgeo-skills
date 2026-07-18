@@ -148,14 +148,14 @@ Si estas skills te resultan útiles, una Star ⭐️ en GitHub ayuda a que otros
 ```bash
 # Run this repo's MCP against the hosted API — works today (absolute path)
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url https://api.agentgeo.org
+  --api-url https://api.agentgeo.org --key ag_live_...
 
 # …or against a local dev backend (development alternative)
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url http://localhost:8080
+  --api-url http://localhost:8787 --key dev-placeholder
 
 # …or from npm (coming soon)
-claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
 Sin credenciales de proveedor, AgentGEO devuelve **fixtures de demostración etiquetados con cero créditos**,

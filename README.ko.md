@@ -146,14 +146,14 @@ sequenceDiagram
 ```bash
 # Connect this repo's MCP to the hosted API — works today (absolute path)
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url https://api.agentgeo.org
+  --api-url https://api.agentgeo.org --key ag_live_...
 
 # …or for local development, point at a locally running API instead
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url http://localhost:8080
+  --api-url http://localhost:8787 --key dev-placeholder
 
 # …or from npm (coming soon)
-claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
 제공자 자격 증명이 없어도 AgentGEO는 라벨이 붙은 **데모 픽스처를 크레딧 소모 없이** 반환하므로,

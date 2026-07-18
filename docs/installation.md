@@ -44,7 +44,7 @@ variables**, in this order:
 
 | Setting | Flag | Env var | Default |
 |---------|------|---------|---------|
-| API base URL | `--api-url <url>` | `AGENTGEO_API_URL` | `http://localhost:8080` |
+| API base URL | `--api-url <url>` | `AGENTGEO_API_URL` | `https://api.agentgeo.org` |
 | API key | `--key <ag_live_...>` | `AGENTGEO_API_KEY` | *(empty → demo mode)* |
 
 The server calls `POST <api-url>/v1/fetches`. A trailing slash on `--api-url` is
@@ -57,7 +57,7 @@ Run this repo's MCP directly with an absolute path, pointed at the **hosted API*
 
 ```bash
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url https://api.agentgeo.org
+  --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
 For **local development** against your own API, point `--api-url` at localhost instead:
@@ -65,14 +65,14 @@ For **local development** against your own API, point `--api-url` at localhost i
 ```bash
 # local-dev alternative
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url http://localhost:8080
+  --api-url http://localhost:8787 --key dev-placeholder
 ```
 
 Once the package is on npm, the `npx` form will work (**coming soon**):
 
 ```bash
 # coming soon — published npm package
-claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
 Confirm it registered:
@@ -101,7 +101,7 @@ Project-scoped lives at `.cursor/mcp.json`; global lives at `~/.cursor/mcp.json`
 }
 ```
 
-For **local development**, swap the URL for `http://localhost:8080`.
+For **local development**, swap the URL for `http://localhost:8787` (the API worker's `npm run dev` port).
 
 To use a live key, add an `env` block instead of putting the secret on the command
 line:
@@ -129,10 +129,10 @@ Any MCP client that launches a stdio server works. The generic command points at
 **hosted API**:
 
 ```bash
-node /absolute/path/to/agentgeo-skills/mcp/index.mjs --api-url https://api.agentgeo.org
+node /absolute/path/to/agentgeo-skills/mcp/index.mjs --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
-For **local development**, use `--api-url http://localhost:8080` instead.
+For **local development**, use `--api-url http://localhost:8787` instead.
 
 Wire that into your client's server config. Codex's `~/.codex/config.toml`, for
 example:
@@ -178,7 +178,7 @@ before you spend anything.
 ```bash
 # Demo mode — no key, zero credits
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url https://api.agentgeo.org
+  --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
 ### Live mode
@@ -317,7 +317,7 @@ Each entry should be a symlink (`geo-* -> …/skills/geo-*`). In your agent, the
 | **`Cannot find module …/index.mjs`** / server exits immediately | Relative or wrong path in the config | Use the **absolute** path from `pwd`. Confirm `ls /absolute/path/to/agentgeo-skills/mcp/index.mjs` succeeds. |
 | **`401 Unauthorized`** in the fetch response | Auth is on (a key exists) but yours is missing or wrong | Pass `--key ag_live_...` or set `AGENTGEO_API_KEY`. Remember: creating the first key at `/app/keys` turns auth on for the workspace. |
 | **`402 Payment Required`** / spend-cap message | Credit balance or spend cap reached in live mode | Top up / raise the cap in the console, or drop the key to fall back to free **demo mode**. |
-| **`AgentGEO API is unavailable at http://localhost:8080`** | No API listening at the `--api-url` target | Start the local API, or point `--api-url` / `AGENTGEO_API_URL` at the hosted URL (`https://api.agentgeo.org`). |
+| **`AgentGEO API is unavailable at http://localhost:8787`** | No API listening at the `--api-url` target | Start the local API, or point `--api-url` / `AGENTGEO_API_URL` at the hosted URL (`https://api.agentgeo.org`). |
 | Skills **don't appear** in the agent | `enable-skills.sh` not run, or wrong scope | Run `./scripts/enable-skills.sh` (project) or `--global`; then `ls -l .claude/skills/` should show 8 symlinks. |
 | **`Invalid fetch_raw_answers arguments`** | Empty `query`, empty `surfaces`, or an unsupported surface name | Send a non-empty `query` and at least one surface from: `chatgpt`, `perplexity`, `gemini`, `google_ai_overview`, `google_ai_mode`, `copilot`. |
 | Fetch **times out** (~60s) | Provider slow or network blocked | Retry with fewer surfaces; check outbound network access to the `--api-url` host. |

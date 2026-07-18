@@ -109,10 +109,10 @@ GET {api_url}/v1/runs/{run_id}      → one run with full normalized records; 40
 
 Run-level quality gates on every ingested run:
 - **`mode == "demo"`**: without provider credentials AgentGEO returns demo fixtures at zero credits. **Never trend demo data** — label the report `DEMO` and stop.
-- **`status == "partial"`**: some surfaces failed (often unconfigured `google_ai_overview`/`google_ai_mode` SERP zones). Diff **only surfaces delivered in BOTH runs** — never report a delta for a surface that failed in one run (that is a config artifact, not a trend).
+- **`status == "partial"`**: some surfaces failed (often unconfigured `google_ai_overview` — SERP zone — or `google_ai_mode` — dataset ID). Diff **only surfaces delivered in BOTH runs** — never report a delta for a surface that failed in one run (that is a config artifact, not a trend).
 - **Billing**: 1 credit per delivered record, 0 for failures. Only delivered records enter any denominator.
 - **`web_search` is honored for `chatgpt` ONLY** — do not assume `web_search:false` changes browsing on other surfaces between runs.
-- **Async snapshot timeout** (`providerFields.snapshot_id` + retry-later error): a transient per-surface failure — exclude it from the diff, retry next run.
+- **Async snapshot timeout** (`providerFields.snapshot_id` + retry-later error): redeem with a single-surface re-fetch carrying `snapshot_id` (no re-charge), or exclude it from the diff and let the next scheduled run recollect.
 
 ## Phase 4: Recompute + Diff
 
@@ -236,8 +236,8 @@ trend: {up|down|flat}
 
 - **MCP not connected**: use the REST endpoints directly (`POST /v1/schedules`, `GET /v1/runs`, `PATCH`/`DELETE /v1/schedules/{id}`) with the same JSON bodies.
 - **No prior run to diff**: this run is the baseline — report "baseline established, no trend yet", emit the meta block, and stop (no fabricated deltas).
-- **Run status `"partial"`**: diff only the intersection of delivered surfaces; list which surfaces failed and why (usually unconfigured Google SERP zones).
-- **Surface returns a failed record** (unconfigured dataset ID, e.g. `google_ai_overview`): exclude it from the diff both runs; note it unconfigured; continue with delivered surfaces.
+- **Run status `"partial"`**: diff only the intersection of delivered surfaces; list which surfaces failed and why (usually an unconfigured SERP zone for AI Overview or dataset ID for AI Mode).
+- **Surface returns a failed record** (unconfigured dataset ID — or, for `google_ai_overview`, an unconfigured SERP zone): exclude it from the diff both runs; note it unconfigured; continue with delivered surfaces.
 - **`mode == "demo"`**: label output `DEMO`, do not trend, and tell the user to configure `PROVIDER_API_KEY` + dataset IDs.
 - **`402` spend cap exceeded**: schedule/fetch stops before provider calls; report credits used and pause the schedule (`PATCH status:paused`) rather than accruing failures.
 - **`422` unknown surface**: correct the surface key against the six valid keys and retry the schedule create/patch.

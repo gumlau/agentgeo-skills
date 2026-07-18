@@ -1,13 +1,20 @@
 #!/usr/bin/env node
 
 /**
- * AgentGEO local MCP server.
+ * AgentGEO MCP server (published to npm as `agentgeo-mcp`).
  *
  * It exposes one deliberately narrow tool: fetch raw AI answer records from
  * the AgentGEO REST API. It does not rank, score, summarize, or interpret
  * the provider response; that work stays in the calling agent.
+ *
+ * Zero dependencies — Node.js built-ins only. Run via `npx -y agentgeo-mcp`
+ * once published, or `node mcp/index.mjs` from a repo clone.
  */
 
+/** Keep in lockstep with package.json "version". */
+const VERSION = "0.3.0";
+
+/** Mirrors worker/src/routes/meta.ts: SUPPORTED_SURFACES (same keys, same order). */
 const SURFACES = [
   "chatgpt",
   "perplexity",
@@ -22,10 +29,48 @@ function readArg(name) {
   return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
+function hasFlag(name) {
+  return process.argv.includes(name);
+}
+
+const USAGE = `agentgeo-mcp ${VERSION} — MCP stdio server for raw AgentGEO answer records.
+
+Usage:
+  agentgeo-mcp --key ag_live_... [--api-url https://api.agentgeo.org]
+
+Flags:
+  --key <key>      AgentGEO API key (env: AGENTGEO_API_KEY). Required.
+                   Create keys in the console under /app/keys. Self-hosted
+                   servers with auth disabled accept any placeholder value.
+  --api-url <url>  AgentGEO API base URL (env: AGENTGEO_API_URL).
+                   Defaults to https://api.agentgeo.org. Self-hosters
+                   pass their own, e.g. --api-url http://localhost:8787.
+  --version        Print the version and exit.
+  --help           Print this message and exit.`;
+
+// Informational flags run (and exit) before the API-key requirement below,
+// so `npx -y agentgeo-mcp --version` works without any configuration.
+if (hasFlag("--version") || hasFlag("-v")) {
+  process.stdout.write(`${VERSION}\n`);
+  process.exit(0);
+}
+if (hasFlag("--help") || hasFlag("-h")) {
+  process.stdout.write(`${USAGE}\n`);
+  process.exit(0);
+}
+
+// Hosted API by default so `npx -y agentgeo-mcp` works for strangers;
+// self-hosters override with --api-url / AGENTGEO_API_URL.
 const apiUrl = (
-  readArg("--api-url") || process.env.AGENTGEO_API_URL || "http://localhost:8080"
+  readArg("--api-url") || process.env.AGENTGEO_API_URL || "https://api.agentgeo.org"
 ).replace(/\/$/, "");
 const apiKey = readArg("--key") || process.env.AGENTGEO_API_KEY || "";
+
+// Fail fast with a usage message instead of emitting 401s on every tool call.
+if (!apiKey) {
+  process.stderr.write(`error: missing API key — pass --key or set AGENTGEO_API_KEY\n\n${USAGE}\n`);
+  process.exit(1);
+}
 
 function write(message) {
   process.stdout.write(`${JSON.stringify(message)}\n`);
@@ -51,18 +96,28 @@ const fetchTool = {
   inputSchema: {
     type: "object",
     additionalProperties: false,
+    // Bounds mirror the worker's FetchCreate validation
+    // (worker/src/routes/fetches.ts: QUERY_MAX, SURFACES_MAX, etc.).
     properties: {
-      query: { type: "string", minLength: 1, description: "Prompt sent to each selected AI surface." },
+      query: { type: "string", minLength: 1, maxLength: 4096, description: "Prompt sent to each selected AI surface." },
       surfaces: {
         type: "array",
         minItems: 1,
+        maxItems: 6,
         uniqueItems: true,
         items: { type: "string", enum: SURFACES },
         description: "AI scraper surfaces to query.",
       },
-      country: { type: "string", default: "US", description: "Two-letter provider country input." },
-      language: { type: "string", default: "en", description: "Provider language input." },
-      web_search: { type: "boolean", default: true, description: "Allow provider web search when supported." },
+      country: { type: "string", minLength: 2, maxLength: 8, default: "US", description: "Provider country input, e.g. \"US\"." },
+      language: { type: "string", minLength: 2, maxLength: 12, default: "en", description: "Provider language input, e.g. \"en\"." },
+      web_search: { type: "boolean", description: "Allow provider web search where supported. Omit to keep the provider default." },
+      snapshot_id: {
+        type: "string",
+        minLength: 1,
+        maxLength: 128,
+        description:
+          "Redeem a finished async job instead of starting a new scrape. When a record fails with providerFields.snapshot_id (slow upstream scrape), retry with that id and the SAME single surface to collect the finished answer without paying for a re-scrape.",
+      },
     },
     required: ["query", "surfaces"],
   },
@@ -86,18 +141,26 @@ async function callFetchTool(id, args) {
   const headers = { "Content-Type": "application/json" };
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
 
+  // web_search is Optional[bool] on the wire (worker parseBody): only send it
+  // when the caller set it, so an omitted flag keeps the provider default
+  // instead of forcing web search on.
+  const body = {
+    query,
+    surfaces,
+    country: args.country || "US",
+    language: args.language || "en",
+  };
+  if (typeof args.web_search === "boolean") body.web_search = args.web_search;
+  if (typeof args.snapshot_id === "string" && args.snapshot_id) body.snapshot_id = args.snapshot_id;
+
   try {
     const response = await fetch(`${apiUrl}/v1/fetches`, {
       method: "POST",
       headers,
-      body: JSON.stringify({
-        query,
-        surfaces,
-        country: args.country || "US",
-        language: args.language || "en",
-        web_search: args.web_search ?? true,
-      }),
-      signal: AbortSignal.timeout(60_000),
+      body: JSON.stringify(body),
+      // Live surfaces are slow: an AI Overview SERP round-trip runs 40-90s and
+      // a chatbot dataset scrape can take a couple of minutes on the sync path.
+      signal: AbortSignal.timeout(180_000),
     });
     const text = await response.text();
     let payload;
@@ -143,7 +206,7 @@ async function handle(message) {
       result(message.id, {
         protocolVersion: message.params?.protocolVersion || "2025-06-18",
         capabilities: { tools: { listChanged: false } },
-        serverInfo: { name: "agentgeo-local", version: "0.1.0" },
+        serverInfo: { name: "agentgeo-mcp", version: VERSION },
         instructions:
           "Use fetch_raw_answers to retrieve raw provider records. Perform ranking, sentiment, comparisons, and reporting locally in the agent.",
       });

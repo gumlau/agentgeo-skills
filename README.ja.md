@@ -136,14 +136,14 @@ sequenceDiagram
 ```bash
 # Connect this repo's MCP to the hosted AgentGEO API — works today (absolute path)
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url https://api.agentgeo.org
+  --api-url https://api.agentgeo.org --key ag_live_...
 
 # …or point it at a local dev server instead
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url http://localhost:8080
+  --api-url http://localhost:8787 --key dev-placeholder
 
 # …or from npm (coming soon)
-claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
 プロバイダーの認証情報がなくても、AgentGEO はラベル付きの**デモフィクスチャをクレジット消費ゼロで**返します。そのため、費用をかける前にすべてのスキルをドライランで試せます。API キーは [agentgeo.org](https://agentgeo.org) で取得してください。

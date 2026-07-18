@@ -1,40 +1,35 @@
 {
   "name": "agentgeo-mcp",
-  "version": "0.1.0",
-  "description": "Local MCP server for AgentGEO — one narrow tool, fetch_raw_answers, that pulls raw AI answers, citations and sources across six surfaces (ChatGPT, Perplexity, Gemini, Google AI Overview, Google AI Mode, Copilot). No ranking, no scoring; analysis stays in your agent.",
+  "version": "0.3.0",
+  "description": "Zero-dependency MCP stdio server exposing one tool: fetch raw AI answer records (answer text, sources, provider metadata) from the AgentGEO API. No ranking, sentiment, or scoring.",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "agentgeo",
+    "ai-search"
+  ],
+  "license": "MIT",
+  "author": "AgentGEO <logan@agentgeo.org>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gumlau/agentgeo.git",
+    "directory": "mcp"
+  },
+  "homepage": "https://agentgeo.org",
+  "private": false,
   "type": "module",
   "bin": {
     "agentgeo-mcp": "./index.mjs"
   },
   "files": [
     "index.mjs",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
-    "check": "node --check index.mjs",
-    "prepublishOnly": "node --check index.mjs"
+    "check": "node --check index.mjs"
   },
-  "keywords": [
-    "mcp",
-    "model-context-protocol",
-    "geo",
-    "generative-engine-optimization",
-    "ai-search",
-    "chatgpt",
-    "perplexity",
-    "gemini",
-    "agentgeo"
-  ],
   "engines": {
     "node": ">=18"
-  },
-  "license": "MIT",
-  "homepage": "https://agentgeo.org",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/gumlau/agentgeo-skills.git"
-  },
-  "publishConfig": {
-    "access": "public"
   }
 }

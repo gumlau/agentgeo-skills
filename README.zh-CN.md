@@ -145,14 +145,14 @@ sequenceDiagram
 ```bash
 # 用本仓库的 MCP 连接托管 API —— 现在就能用(绝对路径)
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url https://api.agentgeo.org
+  --api-url https://api.agentgeo.org --key ag_live_...
 
 # …本地开发替代方案:连接你自己跑的本地 API
 claude mcp add agentgeo -- node /absolute/path/to/agentgeo-skills/mcp/index.mjs \
-  --api-url http://localhost:8080
+  --api-url http://localhost:8787 --key dev-placeholder
 
 # …或从 npm 运行(即将上线)
-claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org
+claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.org --key ag_live_...
 ```
 
 在没有 provider 凭证时,AgentGEO 会返回带标注的**演示数据(demo fixtures),零 credit 消耗**,
