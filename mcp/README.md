@@ -36,6 +36,7 @@ running it interactively.
 | `--api-url <url>` | `AGENTGEO_API_URL` | `https://api.agentgeo.org` | AgentGEO API base URL. Self-hosters point this at their own server, e.g. `--api-url http://localhost:8787` (the worker's `npm run dev` port). |
 | `--version` | — | — | Print the version and exit. |
 | `--help` | — | — | Print usage and exit. |
+| — | `AGENTGEO_TIMEOUT_MS` | `180000` | Fetch timeout in milliseconds. Live surfaces can take minutes; raise it for slower self-hosted upstreams. |
 
 The server exits non-zero with a usage message if no API key is provided.
 

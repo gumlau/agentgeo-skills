@@ -81,6 +81,15 @@ before(async () => {
           res.end(JSON.stringify({ detail: "internal error" }));
           return;
         }
+        if (body.query === "slow") {
+          // Answers after 2s — paired with a tiny AGENTGEO_TIMEOUT_MS to
+          // exercise the client-side timeout without slowing the suite.
+          setTimeout(() => {
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ mode: "demo", answers: [] }));
+          }, 2000);
+          return;
+        }
         // "ok" (and anything else): success payload echoing the request body.
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(
@@ -331,6 +340,24 @@ test("unreachable API is a tool error mentioning unavailable", async () => {
   const res = byId.get(23).result;
   assert.equal(res.isError, true);
   assert.match(res.content[0].text, /unavailable/);
+});
+
+test("AGENTGEO_TIMEOUT_MS bounds the fetch: a slow response becomes a tool error", async () => {
+  const byId = await rpcSession([callFetch(24, { query: "slow", surfaces: ["chatgpt"] })], {
+    args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
+    env: { ...cleanEnv, AGENTGEO_TIMEOUT_MS: "150" },
+  });
+  const res = byId.get(24).result;
+  assert.equal(res.isError, true, "a fetch exceeding the timeout must be a tool error");
+});
+
+test("an invalid AGENTGEO_TIMEOUT_MS falls back to the default (fetch still succeeds)", async () => {
+  const byId = await rpcSession([callFetch(25, { query: "ok", surfaces: ["chatgpt"] })], {
+    args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
+    env: { ...cleanEnv, AGENTGEO_TIMEOUT_MS: "not-a-number" },
+  });
+  const res = byId.get(25).result;
+  assert.ok(!res.isError, "an unparseable override must not break fetching");
 });
 
 // ---------------------------------------------------------------------------

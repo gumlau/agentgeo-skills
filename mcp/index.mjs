@@ -50,7 +50,12 @@ Flags:
                    public /v1/surfaces endpoint. Runs without a key and
                    spends zero credits. Exit 0 when the API answers.
   --version        Print the version and exit.
-  --help           Print this message and exit.`;
+  --help           Print this message and exit.
+
+Environment:
+  AGENTGEO_TIMEOUT_MS  Fetch timeout in milliseconds (default 180000). Live
+                       surfaces can take minutes; raise this for slower
+                       self-hosted upstreams.`;
 
 // Informational flags run (and exit) before the API-key requirement below,
 // so `npx -y agentgeo-mcp --version` works without any configuration.
@@ -69,6 +74,15 @@ const apiUrl = (
   readArg("--api-url") || process.env.AGENTGEO_API_URL || "https://api.agentgeo.org"
 ).replace(/\/$/, "");
 const apiKey = readArg("--key") || process.env.AGENTGEO_API_KEY || "";
+
+// Fetch timeout for /v1/fetches. Live surfaces are slow (an AI Overview SERP
+// round-trip runs 40-90s; a chatbot dataset scrape can take minutes on the
+// sync path), so the default is generous; self-hosters with slower upstreams
+// can raise it via AGENTGEO_TIMEOUT_MS. Non-numeric or non-positive values
+// fall back to the default rather than erroring.
+const parsedTimeout = Number(process.env.AGENTGEO_TIMEOUT_MS);
+const fetchTimeoutMs =
+  Number.isFinite(parsedTimeout) && parsedTimeout > 0 ? parsedTimeout : 180_000;
 
 // Connectivity self-check: `agentgeo-mcp --smoke` answers "can this machine
 // reach the API?" without an MCP client. GET /v1/surfaces is public, so the
@@ -211,9 +225,7 @@ async function callFetchTool(id, args) {
       method: "POST",
       headers,
       body: JSON.stringify(body),
-      // Live surfaces are slow: an AI Overview SERP round-trip runs 40-90s and
-      // a chatbot dataset scrape can take a couple of minutes on the sync path.
-      signal: AbortSignal.timeout(180_000),
+      signal: AbortSignal.timeout(fetchTimeoutMs),
     });
     const text = await response.text();
     let payload;
