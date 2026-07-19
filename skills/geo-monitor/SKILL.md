@@ -108,7 +108,7 @@ GET {api_url}/v1/runs/{run_id}      → one run with full normalized records; 40
 ```
 
 Run-level quality gates on every ingested run:
-- **`mode == "demo"`**: without provider credentials AgentGEO returns demo fixtures at zero credits. **Never trend demo data** — label the report `DEMO` and stop.
+- **`mode == "demo"`**: AgentGEO returns demo fixtures at zero credits — with an `ag_test_...` key on the hosted API, or when provider credentials are unset on a self-hosted server. **Never trend demo data** — label the report `DEMO` and stop.
 - **`status == "partial"`**: some surfaces failed (often unconfigured `google_ai_overview` — SERP zone — or `google_ai_mode` — dataset ID). Diff **only surfaces delivered in BOTH runs** — never report a delta for a surface that failed in one run (that is a config artifact, not a trend).
 - **Billing**: 1 credit per delivered record, 0 for failures. Only delivered records enter any denominator.
 - **`web_search` is honored for `chatgpt` ONLY** — do not assume `web_search:false` changes browsing on other surfaces between runs.
@@ -238,7 +238,7 @@ trend: {up|down|flat}
 - **No prior run to diff**: this run is the baseline — report "baseline established, no trend yet", emit the meta block, and stop (no fabricated deltas).
 - **Run status `"partial"`**: diff only the intersection of delivered surfaces; list which surfaces failed and why (usually an unconfigured SERP zone for AI Overview or dataset ID for AI Mode).
 - **Surface returns a failed record** (unconfigured dataset ID — or, for `google_ai_overview`, an unconfigured SERP zone): exclude it from the diff both runs; note it unconfigured; continue with delivered surfaces.
-- **`mode == "demo"`**: label output `DEMO`, do not trend, and tell the user to configure `PROVIDER_API_KEY` + dataset IDs.
+- **`mode == "demo"`**: label output `DEMO`, do not trend, and tell the user how to get live data: on the hosted API switch to an `ag_live_...` key (`ag_test_...` keys always return demo fixtures); self-hosted servers need `PROVIDER_API_KEY` + surface dataset IDs configured.
 - **`402` spend cap exceeded**: schedule/fetch stops before provider calls; report credits used and pause the schedule (`PATCH status:paused`) rather than accruing failures.
 - **`422` unknown surface**: correct the surface key against the six valid keys and retry the schedule create/patch.
 - **`404` on `GET /v1/runs/{id}` or `PATCH`/`DELETE /v1/schedules/{id}`**: the run/schedule does not exist — re-list (`GET /v1/runs`, `GET /v1/schedules`) and reconcile IDs before retrying.
