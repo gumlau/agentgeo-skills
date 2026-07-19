@@ -45,6 +45,10 @@ Flags:
   --api-url <url>  AgentGEO API base URL (env: AGENTGEO_API_URL).
                    Defaults to https://api.agentgeo.org. Self-hosters
                    pass their own, e.g. --api-url http://localhost:8787.
+  --smoke          Connectivity self-check (no MCP client needed): print the
+                   version, resolved api-url, and key status, then GET the
+                   public /v1/surfaces endpoint. Runs without a key and
+                   spends zero credits. Exit 0 when the API answers.
   --version        Print the version and exit.
   --help           Print this message and exit.`;
 
@@ -65,6 +69,55 @@ const apiUrl = (
   readArg("--api-url") || process.env.AGENTGEO_API_URL || "https://api.agentgeo.org"
 ).replace(/\/$/, "");
 const apiKey = readArg("--key") || process.env.AGENTGEO_API_KEY || "";
+
+// Connectivity self-check: `agentgeo-mcp --smoke` answers "can this machine
+// reach the API?" without an MCP client. GET /v1/surfaces is public, so the
+// check runs even when no key is set (this branch sits before the missing-key
+// fail-fast on purpose) and it never calls POST /v1/fetches — zero credits.
+if (hasFlag("--smoke")) {
+  // Report the key's prefix class only; the key itself is never printed.
+  const keyStatus = !apiKey
+    ? "none set"
+    : apiKey.startsWith("ag_test_")
+      ? "ag_test_ (demo mode)"
+      : apiKey.startsWith("ag_live_")
+        ? "ag_live_ (live mode)"
+        : "custom";
+  process.stdout.write(`agentgeo-mcp ${VERSION}\n`);
+  process.stdout.write(`api-url: ${apiUrl}\n`);
+  process.stdout.write(`key: ${keyStatus}\n`);
+  try {
+    // Deliberately no Authorization header: an unauthenticated probe keeps
+    // "is the API reachable" separate from "is my key valid".
+    const response = await fetch(`${apiUrl}/v1/surfaces`, {
+      signal: AbortSignal.timeout(15_000),
+    });
+    const text = await response.text();
+    let payload;
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      payload = undefined;
+    }
+    if (!response.ok || payload === undefined) {
+      process.stdout.write(
+        `surfaces: HTTP ${response.status}${payload === undefined ? " (non-JSON body)" : ""} — expected 200 with JSON\n`,
+      );
+      process.exit(1);
+    }
+    const engines = Array.isArray(payload.engines) ? payload.engines : [];
+    const configured = engines.filter((engine) => engine?.configured === true).length;
+    process.stdout.write(
+      `surfaces: reachable — count ${payload.count}, ${configured}/${engines.length} engines configured\n`,
+    );
+    process.exit(0);
+  } catch (cause) {
+    process.stdout.write(
+      `surfaces: unreachable at ${apiUrl}: ${cause instanceof Error ? cause.message : String(cause)}\n`,
+    );
+    process.exit(1);
+  }
+}
 
 // Fail fast with a usage message instead of emitting 401s on every tool call.
 if (!apiKey) {
