@@ -10,6 +10,17 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 npm publish of `agentgeo-mcp@0.3.1` is pending.
 
+### Added
+
+- **MCP**: `--smoke` flag — connectivity self-check that runs without an MCP
+  client and without a key. Prints the version, resolved api-url, and key
+  status (prefix class only, never the key), then probes the public
+  `GET /v1/surfaces` endpoint. Spends zero credits; exit 0 when the API
+  answers.
+- **MCP**: automated test suite (`mcp/test.mjs`, `node:test` + built-ins only)
+  covering the CLI flags, the JSON-RPC surface, `fetch_raw_answers` against a
+  local HTTP mock, and `--smoke`; wired into CI via `npm test`.
+
 ### Fixed
 
 - **MCP**: HTTP 200 responses with non-JSON bodies are now reported as tool

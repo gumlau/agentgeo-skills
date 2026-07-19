@@ -27,7 +27,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "check": "node --check index.mjs"
+    "check": "node --check index.mjs",
+    "test": "node --test test.mjs"
   },
   "engines": {
     "node": ">=18"

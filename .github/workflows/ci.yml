@@ -54,6 +54,9 @@ jobs:
           fi
           echo "no-key exit check OK"
 
+      - name: Run MCP test suite
+        run: (cd mcp && npm test)
+
   enable-skills:
     name: enable-skills.sh (bash, sh, zsh)
     runs-on: ubuntu-latest
