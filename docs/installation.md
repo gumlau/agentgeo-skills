@@ -50,6 +50,22 @@ variables**, in this order:
 The server calls `POST <api-url>/v1/fetches`. A trailing slash on `--api-url` is
 stripped automatically.
 
+### Claude Code — plugin install (fastest)
+
+Inside Claude Code, two commands install the eight skills and auto-wire the MCP
+server (started on demand via `npx`):
+
+```text
+/plugin marketplace add gumlau/agentgeo-skills
+/plugin install agentgeo@agentgeo
+```
+
+Export `AGENTGEO_API_KEY` in your shell before launching Claude Code (an
+`ag_test_...` key keeps everything in zero-credit demo mode). A plugin install
+also covers [Step 3](#step-3--enable-the-skills) — the skills ship inside the
+plugin. The rest of this step is the manual registration path for Claude Code,
+Cursor, and Codex.
+
 ### Claude Code
 
 Run this repo's MCP directly with an absolute path, pointed at the **hosted API**

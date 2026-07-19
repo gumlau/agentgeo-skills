@@ -141,6 +141,19 @@ sequenceDiagram
 > 워크스루: **[설치 가이드](./docs/installation.md)** ·
 > **[사용 가이드](./docs/usage.md)**
 
+### 가장 빠른 방법 — Claude Code 플러그인으로 설치
+
+명령 두 줄로 8개 스킬 **및** MCP 서버(`npx`로 자동 시작)가 한 번에 연결됩니다:
+
+```text
+/plugin marketplace add gumlau/agentgeo-skills
+/plugin install agentgeo@agentgeo
+```
+
+Claude Code를 시작하기 전에 `export AGENTGEO_API_KEY=ag_test_...`(무료 테스트
+키 = 크레딧 0의 데모 모드)를 실행한 뒤 "실행" 섹션으로 바로 이동하세요. 아래
+수동 단계는 Cursor, Codex 등 다른 MCP 클라이언트용입니다.
+
 ### 사전 준비 — AgentGEO MCP 연결
 
 ```bash

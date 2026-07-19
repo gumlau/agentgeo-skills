@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "agentgeo": {
+      "command": "npx",
+      "args": ["-y", "agentgeo-mcp"],
+      "env": {
+        "AGENTGEO_API_KEY": "${AGENTGEO_API_KEY}",
+        "AGENTGEO_API_URL": "${AGENTGEO_API_URL:-https://api.agentgeo.org}"
+      },
+      "note": "Requires AGENTGEO_API_KEY in your environment before the agent starts — an ag_test_... key (free, console /app/keys) runs every fetch in zero-credit demo mode; ag_live_... returns live answers. Self-hosters point AGENTGEO_API_URL at their own server."
+    }
+  }
+}

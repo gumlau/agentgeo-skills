@@ -20,6 +20,13 @@ npm publish of `agentgeo-mcp@0.3.1` is pending.
 - **MCP**: automated test suite (`mcp/test.mjs`, `node:test` + built-ins only)
   covering the CLI flags, the JSON-RPC surface, `fetch_raw_answers` against a
   local HTTP mock, and `--smoke`; wired into CI via `npm test`.
+- **MCP**: `AGENTGEO_TIMEOUT_MS` environment override for the 180 s fetch
+  timeout (invalid values fall back to the default).
+- **Plugin**: the repo installs as a Claude Code plugin —
+  `/plugin marketplace add gumlau/agentgeo-skills` then
+  `/plugin install agentgeo@agentgeo` wires all eight skills plus the MCP
+  server (`.claude-plugin/` manifests + root `.mcp.json` with
+  `AGENTGEO_API_KEY` passthrough).
 
 ### Fixed
 

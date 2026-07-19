@@ -145,6 +145,20 @@ Si ces skills vous sont utiles, une étoile GitHub ⭐️ aide d'autres créateu
 > parcours de bout en bout : **[Guide d'installation](./docs/installation.md)** ·
 > **[Guide d'utilisation](./docs/usage.md)**
 
+### La voie la plus rapide — installer comme plugin Claude Code
+
+Deux commandes activent les huit skills **et** le serveur MCP (démarré automatiquement via `npx`) :
+
+```text
+/plugin marketplace add gumlau/agentgeo-skills
+/plugin install agentgeo@agentgeo
+```
+
+Exportez votre clé avant de lancer Claude Code — `export AGENTGEO_API_KEY=ag_test_...`
+(clé de test gratuite = mode démo à zéro crédit) — puis passez directement à la
+section « Lancer l'analyse ». Les étapes manuelles ci-dessous valent pour Cursor,
+Codex et tout autre client MCP.
+
 ### Prérequis — connecter le MCP AgentGEO
 
 ```bash

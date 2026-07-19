@@ -1,0 +1,13 @@
+{
+  "name": "agentgeo",
+  "owner": { "name": "AgentGEO", "url": "https://agentgeo.org" },
+  "description": "GEO skills for coding agents: fetch what AI engines actually answer about a brand, then compute visibility, share-of-voice, citations and sentiment locally.",
+  "plugins": [
+    {
+      "name": "agentgeo",
+      "source": "./",
+      "version": "0.3.1",
+      "description": "The eight geo-* Agent Skills plus the agentgeo-mcp stdio server (auto-started via npx; set AGENTGEO_API_KEY — an ag_test_... key runs everything in zero-credit demo mode)."
+    }
+  ]
+}

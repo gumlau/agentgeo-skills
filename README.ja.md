@@ -131,6 +131,19 @@ sequenceDiagram
 > 📖 クライアント別（Claude Code / Cursor / Codex）のステップバイステップのセットアップと、エンドツーエンドのウォークスルーはこちら: **[インストールガイド](./docs/installation.md)** ·
 > **[使い方ガイド](./docs/usage.md)**
 
+### 最速の方法 — Claude Code プラグインとしてインストール
+
+2 つのコマンドで 8 つのスキル**と** MCP サーバー(`npx` 経由で自動起動)がまとめて使えるようになります:
+
+```text
+/plugin marketplace add gumlau/agentgeo-skills
+/plugin install agentgeo@agentgeo
+```
+
+Claude Code を起動する前に `export AGENTGEO_API_KEY=ag_test_...`(無料のテスト
+キー = クレジット消費ゼロのデモモード)を実行し、「実行する」セクションへ進んで
+ください。以下の手動手順は Cursor・Codex などの MCP クライアント向けです。
+
 ### 前提 — AgentGEO MCP を接続する
 
 ```bash

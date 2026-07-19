@@ -1,0 +1,22 @@
+{
+  "name": "agentgeo",
+  "displayName": "AgentGEO GEO Skills",
+  "description": "Eight Generative Engine Optimization skills (prompt-set, visibility, share-of-voice, citations, sentiment, competitors, monitor, report) that pull real AI answers from ChatGPT, Perplexity, Gemini, Google AI Overview, Google AI Mode and Copilot through the AgentGEO MCP, then run every analysis agent-side. Auto-wires the zero-dependency agentgeo-mcp server via npx.",
+  "version": "0.3.1",
+  "author": {
+    "name": "AgentGEO",
+    "url": "https://agentgeo.org"
+  },
+  "repository": "https://github.com/gumlau/agentgeo-skills",
+  "homepage": "https://agentgeo.org",
+  "license": "MIT",
+  "keywords": [
+    "geo",
+    "generative-engine-optimization",
+    "ai-search",
+    "mcp",
+    "share-of-voice",
+    "citations",
+    "brand-visibility"
+  ]
+}

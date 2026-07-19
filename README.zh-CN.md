@@ -140,6 +140,19 @@ sequenceDiagram
 > 📖 各客户端(Claude Code / Cursor / Codex)的完整分步配置,以及端到端演练:
 > **[安装指南](./docs/installation.md)** · **[使用指南](./docs/usage.md)**
 
+### 最快路径 —— 作为 Claude Code 插件安装
+
+两条命令同时装好全部 8 个 skill **和** MCP 服务器(通过 `npx` 自动启动):
+
+```text
+/plugin marketplace add gumlau/agentgeo-skills
+/plugin install agentgeo@agentgeo
+```
+
+启动 Claude Code 前先导出你的 key —— `export AGENTGEO_API_KEY=ag_test_...`
+(免费测试 key = 零 credit 演示模式),然后直接跳到「运行」一节。下面的手动
+步骤适用于 Cursor、Codex 及其他 MCP 客户端。
+
 ### 前置 —— 连接 AgentGEO MCP
 
 ```bash
