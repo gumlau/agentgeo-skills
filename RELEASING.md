@@ -8,8 +8,10 @@ claude mcp add agentgeo -- npx -y agentgeo-mcp --api-url https://api.agentgeo.or
 
 The package name `agentgeo-mcp` is available on npm, and `mcp/package.json` is
 already publish-ready (public access, `bin`, `files`, provenance-friendly
-`repository`). The tarball ships exactly three files: `index.mjs`, `README.md`,
-`package.json` (~3 kB).
+`repository`). The tarball ships `index.mjs`, `skills.generated.mjs` (the
+eight bundled GEO skills — regenerate with `node scripts/build-skill-bundle.mjs`
+after any SKILL.md change; CI fails on drift), `README.md`, and
+`package.json` (~140 kB).
 
 ## One-time setup — NPM_TOKEN
 
@@ -23,9 +25,15 @@ The GitHub Actions workflow publishes with a token, so no local `npm login` is n
 
 ## Publish (recommended — automated)
 
-1. Bump the version and update the changelog:
+1. Bump the version and update the changelog — five version sites move in
+   lockstep (CI enforces all of them):
    - `mcp/package.json` → `"version"` (follow [SemVer](https://semver.org/))
+   - `mcp/index.mjs` → the `VERSION` const
+   - `mcp/server.json` → `"version"` AND `"packages[0].version"` (MCP registry manifest)
+   - `.claude-plugin/plugin.json` → `"version"`
    - `CHANGELOG.md` → move items under a new version heading
+   If any `skills/*/SKILL.md` changed, regenerate the bundle:
+   `node scripts/build-skill-bundle.mjs` (CI fails on drift).
 2. Commit and push to `main`.
 3. Cut a GitHub Release:
 
@@ -51,7 +59,8 @@ If you'd rather publish from your machine:
 ```bash
 cd mcp
 npm login                       # once
-npm publish --access public     # runs prepublishOnly: node --check index.mjs
+npm publish --access public     # runs prepublishOnly: node index.mjs --version
+                                # (loads the module — proves skills.generated.mjs shipped)
 ```
 
 ## Versioning

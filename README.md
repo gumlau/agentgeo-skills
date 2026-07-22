@@ -15,7 +15,7 @@ analysis locally.
 <p>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
-  <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
+  <img src="https://img.shields.io/badge/MCP-3%20tools-5865F2.svg" alt="MCP: 3 tools">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
   <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
@@ -51,11 +51,13 @@ judgment in this repo is computed by the skills, inside your agent — never by 
 
 Your coding agent reaches AgentGEO through two pieces in this repo:
 
-- **MCP server** (`mcp/`) — exposes one narrow tool, `fetch_raw_answers`, that any
-  MCP-compatible agent (Claude Code, Cursor, Codex) can call.
+- **MCP server** (`mcp/`) — `fetch_raw_answers` pulls the raw records, and
+  `list_geo_skills` / `get_geo_skill` deliver the eight skills below straight into any
+  MCP-compatible agent (Claude Code, Cursor, Codex) — no separate skill install needed.
 - **Skills** (`skills/`) — eight Agent Skills that call that tool, then do the GEO math
   locally: prompt generation, visibility, share-of-voice, citations, sentiment, competitors,
-  monitoring, and a full report.
+  monitoring, and a full report. Built into the MCP since 0.4.0; also installable as files
+  for auto-triggering.
 
 ```mermaid
 graph TB
@@ -142,6 +144,20 @@ If you find these skills useful, a GitHub Star ⭐️ helps other builders find 
 > 📖 Full step-by-step setup per client (Claude Code / Cursor / Codex) and an end-to-end
 > walkthrough: **[Installation Guide](./docs/installation.md)** ·
 > **[Usage Guide](./docs/usage.md)**
+
+### Zero-install path — the skills are built into the MCP
+
+Since `agentgeo-mcp@0.4.0`, connecting the MCP server **is** the install: all
+eight skills ship inside it. Any connected agent can call `list_geo_skills`,
+load a workflow with `get_geo_skill`, and run it — and the same eight skills
+appear as MCP prompts (`/mcp__agentgeo__geo-report`-style slash commands in Claude
+Code). The server prefers the live copies from the AgentGEO API and falls back
+to the bundled ones offline, so the workflows stay fresh without reinstalling.
+
+Installing the skill *files* locally (the plugin or `enable-skills.sh` paths
+below) is still the sharpest setup for heavy use: file-based skills
+auto-trigger from your prompt without a tool round-trip. But nobody has to
+start there anymore.
 
 ### Fastest path — install as a Claude Code plugin
 

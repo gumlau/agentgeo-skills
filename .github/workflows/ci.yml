@@ -21,6 +21,14 @@ jobs:
       - name: Syntax check
         run: node --check mcp/index.mjs
 
+      - name: Skill bundle freshness (skills.generated.mjs committed and matches skills/)
+        run: |
+          # ls-files first: `git diff` exits 0 for an UNTRACKED path, so a
+          # never-committed bundle would otherwise sail through green.
+          git ls-files --error-unmatch mcp/skills.generated.mjs
+          node scripts/build-skill-bundle.mjs
+          git diff --exit-code mcp/skills.generated.mjs
+
       - name: Version lockstep (index.mjs VERSION == package.json version)
         run: |
           node -e '
@@ -33,7 +41,21 @@ jobs:
               console.error(`version mismatch: mcp/index.mjs has ${m[1]}, mcp/package.json has ${pkg.version}`);
               process.exit(1);
             }
-            console.log(`version lockstep OK: ${m[1]}`);
+            const server = JSON.parse(fs.readFileSync("mcp/server.json", "utf8"));
+            if (server.version !== pkg.version || server.packages?.[0]?.version !== pkg.version) {
+              console.error(`version mismatch: mcp/server.json has ${server.version}/${server.packages?.[0]?.version}, mcp/package.json has ${pkg.version}`);
+              process.exit(1);
+            }
+            if (server.name !== pkg.mcpName) {
+              console.error(`mcpName mismatch: mcp/server.json name ${server.name} != package.json mcpName ${pkg.mcpName}`);
+              process.exit(1);
+            }
+            const plugin = JSON.parse(fs.readFileSync(".claude-plugin/plugin.json", "utf8"));
+            if (plugin.version !== pkg.version) {
+              console.error(`version mismatch: .claude-plugin/plugin.json has ${plugin.version}, mcp/package.json has ${pkg.version}`);
+              process.exit(1);
+            }
+            console.log(`version lockstep OK: ${m[1]} (index.mjs, package.json, server.json x2, plugin.json)`);
           '
 
       - name: Stdio protocol smoke (initialize + tools/list)

@@ -6,9 +6,40 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-07-22
+
+The eight GEO skills are now **built into the MCP server** — any connected
+agent (Claude Code, Cursor, Codex, Windsurf, …) gets the full analysis
+workflows with zero extra install.
+
+### Added
+
+- **MCP**: `list_geo_skills` tool — the skill catalog in recommended pipeline
+  order, with when-to-use guidance. Free: contacts no AI provider, spends no
+  credits.
+- **MCP**: `get_geo_skill` tool — returns one full SKILL.md workflow.
+  Remote-first from the API's `GET /v1/skills/{name}` (fresh without an npm
+  release; the authenticated read doubles as the console's agent-connected
+  signal), falling back to the copies bundled in the npm tarball
+  (`skills.generated.mjs`, built by `scripts/build-skill-bundle.mjs`).
+- **MCP**: prompts capability — the same eight skills as MCP prompts with an
+  optional `request` argument; Claude Code renders them as
+  `/mcp__agentgeo__geo-report`-style slash commands.
+- **MCP**: `mcpName` field (`io.github.gumlau/agentgeo-mcp`) in package.json
+  plus a committed `mcp/server.json`, unblocking the official MCP registry
+  submission.
+- **CI**: bundle freshness check — regenerates `skills.generated.mjs` and
+  fails when it drifts from `skills/*/SKILL.md`.
+
+### Changed
+
+- **MCP**: initialize `instructions` now route any GEO analysis ask through
+  `list_geo_skills` → `get_geo_skill` before fetching, and `tools/list` leads
+  with the skill tools.
+
 ## [0.3.1] — 2026-07-18
 
-npm publish of `agentgeo-mcp@0.3.1` is pending.
+Published to npm as `agentgeo-mcp@0.3.1` on 2026-07-19.
 
 ### Added
 
@@ -74,7 +105,8 @@ Published to npm as `agentgeo-mcp@0.3.0` (first npm release).
 - **Installation** and **Usage** guides under `docs/`.
 - Project docs: `CONTRIBUTING`, `CODE_OF_CONDUCT`, `SECURITY`, issue/PR templates.
 
-[Unreleased]: https://github.com/gumlau/agentgeo-skills/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/gumlau/agentgeo-skills/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/gumlau/agentgeo-skills/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/gumlau/agentgeo-skills/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/gumlau/agentgeo-skills/compare/v0.1.0...v0.3.0
 [0.1.0]: https://github.com/gumlau/agentgeo-skills/releases/tag/v0.1.0

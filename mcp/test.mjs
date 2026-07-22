@@ -53,6 +53,58 @@ before(async () => {
     let raw = "";
     req.on("data", (chunk) => (raw += chunk));
     req.on("end", () => {
+      if (req.method === "GET" && req.url === "/v1/skills") {
+        // A one-entry live catalog, deliberately different from the bundle:
+        // tests assert the remote copy wins over the eight bundled skills.
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            object: "skill_list",
+            count: 1,
+            skills: [{ name: "geo-visibility", description: "live catalog entry", version: "9.9.9" }],
+          }),
+        );
+        return;
+      }
+      if (req.method === "GET" && req.url === "/v1/skills/geo-visibility") {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            object: "skill",
+            name: "geo-visibility",
+            description: "live",
+            version: "9.9.9",
+            content: "# LIVE geo-visibility workflow",
+          }),
+        );
+        return;
+      }
+      if (req.method === "GET" && req.url === "/v1/skills/geo-report") {
+        // Non-JSON body: the server must fall back to the bundled copy.
+        res.writeHead(200, { "Content-Type": "text/html" });
+        res.end("<html>gateway interstitial</html>");
+        return;
+      }
+      if (req.method === "GET" && req.url === "/v1/skills/geo-ninth") {
+        // A catalog-only skill the npm bundle doesn't know about — added by a
+        // worker deploy after this package shipped.
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            object: "skill",
+            name: "geo-ninth",
+            description: "catalog-only skill",
+            version: "1.0.0",
+            content: "# NINTH workflow",
+          }),
+        );
+        return;
+      }
+      if (req.method === "GET" && req.url?.startsWith("/v1/skills/")) {
+        res.writeHead(404, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ detail: "unknown skill" }));
+        return;
+      }
       if (req.method === "GET" && req.url === "/v1/surfaces") {
         res.writeHead(200, { "Content-Type": "application/json" });
         res.end(
@@ -254,10 +306,14 @@ test("initialize, ping, tools/list", async () => {
   ]);
   assert.equal(byId.get(1).result.serverInfo.name, "agentgeo-mcp");
   assert.equal(byId.get(1).result.serverInfo.version, PKG.version);
+  assert.ok(byId.get(1).result.capabilities.prompts, "prompts capability must be declared");
+  assert.match(byId.get(1).result.instructions, /list_geo_skills/);
   assert.deepEqual(byId.get(2).result, {});
   const tools = byId.get(3).result.tools;
-  assert.equal(tools.length, 1);
-  assert.equal(tools[0].name, "fetch_raw_answers");
+  assert.deepEqual(
+    tools.map((tool) => tool.name),
+    ["list_geo_skills", "get_geo_skill", "fetch_raw_answers"],
+  );
 });
 
 test("unknown method returns -32601", async () => {
@@ -385,4 +441,169 @@ test("--smoke runs without a key (no fail-fast)", async () => {
   assert.equal(out.code, 0, "smoke must not require a key");
   assert.match(out.stdout, /none set/);
   assert.doesNotMatch(out.stderr, /missing API key/);
+});
+
+// ---------------------------------------------------------------------------
+// 5. Built-in GEO skills: tools + prompts
+// ---------------------------------------------------------------------------
+
+/** Mirrors scripts/build-skill-bundle.mjs ORDER (the recommended pipeline). */
+const PIPELINE_ORDER = [
+  "geo-prompt-set",
+  "geo-visibility",
+  "geo-share-of-voice",
+  "geo-citations",
+  "geo-sentiment",
+  "geo-competitors",
+  "geo-monitor",
+  "geo-report",
+];
+
+const callTool = (id, name, args = {}) => ({
+  jsonrpc: "2.0",
+  id,
+  method: "tools/call",
+  params: { name, arguments: args },
+});
+
+test("list_geo_skills prefers the live catalog over the bundle", async () => {
+  const byId = await rpcSession([callTool(30, "list_geo_skills")], {
+    args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
+  });
+  const res = byId.get(30).result;
+  assert.ok(!res.isError, "listing skills must never be an error");
+  const payload = res.structuredContent;
+  assert.equal(payload.object, "skill_list");
+  assert.equal(payload.count, 1, "the mock's one-entry live catalog must win over the bundle");
+  assert.equal(payload.skills[0].version, "9.9.9");
+  assert.match(payload.pipeline, /geo-prompt-set/);
+  assert.match(payload.next_step, /get_geo_skill/);
+});
+
+test("list_geo_skills falls back to the eight bundled skills when the API is unreachable", async () => {
+  const port = await deadPort();
+  const byId = await rpcSession([callTool(31, "list_geo_skills")], {
+    args: ["--key", "ag_test_dummy", "--api-url", `http://127.0.0.1:${port}`],
+  });
+  const payload = byId.get(31).result.structuredContent;
+  assert.equal(payload.count, 8);
+  assert.deepEqual(
+    payload.skills.map((skill) => skill.name),
+    PIPELINE_ORDER,
+    "bundled skills must list in pipeline order",
+  );
+});
+
+test("get_geo_skill returns the live SKILL.md when the API serves it", async () => {
+  const byId = await rpcSession([callTool(32, "get_geo_skill", { name: "geo-visibility" })], {
+    args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
+  });
+  const res = byId.get(32).result;
+  assert.ok(!res.isError);
+  assert.equal(res.content[0].text, "# LIVE geo-visibility workflow");
+});
+
+test("get_geo_skill falls back to the bundled copy on a non-JSON response", async () => {
+  const byId = await rpcSession([callTool(33, "get_geo_skill", { name: "geo-report" })], {
+    args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
+  });
+  const text = byId.get(33).result.content[0].text;
+  assert.ok(text.startsWith("---"), "bundled SKILL.md keeps its frontmatter");
+  assert.match(text, /# geo-report Skill/);
+});
+
+test("get_geo_skill falls back to the bundled copy on a 404", async () => {
+  const byId = await rpcSession([callTool(34, "get_geo_skill", { name: "geo-monitor" })], {
+    args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
+  });
+  assert.match(byId.get(34).result.content[0].text, /# geo-monitor Skill/);
+});
+
+test("get_geo_skill serves a catalog-only skill the bundle doesn't know", async () => {
+  const byId = await rpcSession([callTool(35, "get_geo_skill", { name: "geo-ninth" })], {
+    args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
+  });
+  const res = byId.get(35).result;
+  assert.ok(!res.isError, "a live-catalog skill must resolve even without a bundled copy");
+  assert.equal(res.content[0].text, "# NINTH workflow");
+});
+
+test("get_geo_skill rejects an unknown skill name when the API misses too", async () => {
+  const byId = await rpcSession([callTool(36, "get_geo_skill", { name: "geo-nonsense" })], {
+    args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
+  });
+  assert.equal(byId.get(36).error.code, -32602);
+  assert.deepEqual(byId.get(36).error.data.known_skills, PIPELINE_ORDER);
+});
+
+test("get_geo_skill rejects an unknown name offline (bundle miss, API down)", async () => {
+  const port = await deadPort();
+  const byId = await rpcSession([callTool(37, "get_geo_skill", { name: "geo-nonsense" })], {
+    args: ["--key", "ag_test_dummy", "--api-url", `http://127.0.0.1:${port}`],
+  });
+  assert.equal(byId.get(37).error.code, -32602);
+});
+
+test("get_geo_skill rejects path-shaped names before any network call", async () => {
+  // No --api-url: a name that failed the slug gate must never reach fetch, so
+  // the default hosted API being unreachable in tests is irrelevant.
+  const byId = await rpcSession([
+    callTool(38, "get_geo_skill", { name: "../keys" }),
+    callTool(39, "get_geo_skill", { name: "geo/../fetches" }),
+  ]);
+  assert.equal(byId.get(38).error.code, -32602);
+  assert.equal(byId.get(39).error.code, -32602);
+});
+
+test("prompts/list returns the eight skills in pipeline order", async () => {
+  const byId = await rpcSession([{ jsonrpc: "2.0", id: 40, method: "prompts/list" }]);
+  const prompts = byId.get(40).result.prompts;
+  assert.deepEqual(
+    prompts.map((prompt) => prompt.name),
+    PIPELINE_ORDER,
+  );
+  for (const prompt of prompts) {
+    assert.ok(!prompt.description.includes("Use when"), `${prompt.name}: trigger tail must be trimmed`);
+    assert.equal(prompt.arguments[0].name, "request");
+    assert.equal(prompt.arguments[0].required, false);
+  }
+});
+
+test("prompts/get returns the workflow and appends the request argument", async () => {
+  const port = await deadPort();
+  const byId = await rpcSession(
+    [
+      {
+        jsonrpc: "2.0",
+        id: 41,
+        method: "prompts/get",
+        params: { name: "geo-prompt-set", arguments: { request: "acme.com vs notion.so" } },
+      },
+    ],
+    { args: ["--key", "ag_test_dummy", "--api-url", `http://127.0.0.1:${port}`] },
+  );
+  const res = byId.get(41).result;
+  const text = res.messages[0].content.text;
+  assert.equal(res.messages[0].role, "user");
+  assert.ok(text.startsWith("---"), "the workflow leads");
+  assert.ok(text.endsWith("User request: acme.com vs notion.so"), "the request lands at the end");
+});
+
+test("prompts/get without arguments returns the bare workflow", async () => {
+  const port = await deadPort();
+  const byId = await rpcSession(
+    [{ jsonrpc: "2.0", id: 42, method: "prompts/get", params: { name: "geo-report" } }],
+    { args: ["--key", "ag_test_dummy", "--api-url", `http://127.0.0.1:${port}`] },
+  );
+  const text = byId.get(42).result.messages[0].content.text;
+  assert.match(text, /# geo-report Skill/);
+  assert.ok(!text.includes("User request:"), "no argument, no appendix");
+});
+
+test("prompts/get rejects an unknown prompt", async () => {
+  const byId = await rpcSession([
+    { jsonrpc: "2.0", id: 43, method: "prompts/get", params: { name: "geo-nonsense" } },
+  ]);
+  assert.equal(byId.get(43).error.code, -32602);
+  assert.deepEqual(byId.get(43).error.data.known_prompts, PIPELINE_ORDER);
 });

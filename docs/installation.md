@@ -35,9 +35,12 @@ ls mcp/index.mjs               # should print the path, no error
 
 ## Step 1 — Connect the AgentGEO MCP
 
-The MCP server is a single, zero-dependency file: `mcp/index.mjs`. It exposes exactly
-one tool, `fetch_raw_answers`. Register it once with your agent using the config for
-your client below.
+The MCP server is zero-dependency (two files: `mcp/index.mjs` plus the
+generated `mcp/skills.generated.mjs` skill bundle it imports). It exposes
+three tools — `fetch_raw_answers` for raw records, and `list_geo_skills` /
+`get_geo_skill`, which deliver the eight GEO skills straight into the agent
+(they are also exposed as MCP prompts). Register it once with your agent using
+the config for your client below.
 
 The server reads its target API and key from **flags first, then environment
 variables**, in this order:
@@ -47,8 +50,11 @@ variables**, in this order:
 | API base URL | `--api-url <url>` | `AGENTGEO_API_URL` | `https://api.agentgeo.org` |
 | API key | `--key <ag_live_...>` | `AGENTGEO_API_KEY` | *(required — the server exits if missing)* |
 
-The server calls `POST <api-url>/v1/fetches`. A trailing slash on `--api-url` is
-stripped automatically.
+The server calls `POST <api-url>/v1/fetches` for raw records and
+`GET <api-url>/v1/skills` (authenticated) for live skill copies — that skill
+read is free, and it is also the signal the console's onboarding page watches
+to mark your agent connected. A trailing slash on `--api-url` is stripped
+automatically.
 
 ### Claude Code — plugin install (fastest)
 

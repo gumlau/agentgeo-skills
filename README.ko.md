@@ -14,7 +14,7 @@ Gemini, Google AI Overview, Google AI Mode, Copilot — 전반에서 **실제** 
 <p>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
-  <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
+  <img src="https://img.shields.io/badge/MCP-3%20tools-5865F2.svg" alt="MCP: 3 tools">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
   <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
@@ -50,8 +50,9 @@ Gemini, Google AI Overview, Google AI Mode, Copilot — 전반에서 **실제** 
 
 코딩 에이전트는 이 저장소의 두 요소를 통해 AgentGEO에 도달합니다.
 
-- **MCP 서버** (`mcp/`) — 하나의 좁은 도구 `fetch_raw_answers`를 노출하며, MCP 호환
-  에이전트(Claude Code, Cursor, Codex)라면 무엇이든 호출할 수 있습니다.
+- **MCP 서버** (`mcp/`) — `fetch_raw_answers`가 원시 레코드를 가져오고, `list_geo_skills` /
+  `get_geo_skill`이 여덟 개의 스킬을 MCP 호환 에이전트(Claude Code, Cursor, Codex)에 바로
+  전달합니다. 스킬을 따로 설치할 필요가 없습니다(0.4.0부터 MCP에 내장).
 - **Skills** (`skills/`) — 그 도구를 호출한 뒤 GEO 연산을 로컬에서 수행하는 여덟 개의 Agent Skills입니다:
   프롬프트 생성, 가시성, 점유율, 인용, 감성, 경쟁사, 모니터링, 그리고 종합 리포트.
 

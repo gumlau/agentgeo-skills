@@ -15,7 +15,7 @@ génératifs (Generative Engine Optimization) en local.
 <p>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
-  <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
+  <img src="https://img.shields.io/badge/MCP-3%20tools-5865F2.svg" alt="MCP: 3 tools">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
   <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
@@ -53,8 +53,9 @@ plateforme.
 
 Votre agent de code atteint AgentGEO à travers deux composants de ce dépôt :
 
-- **Serveur MCP** (`mcp/`) — expose un seul outil restreint, `fetch_raw_answers`, que tout
-  agent compatible MCP (Claude Code, Cursor, Codex) peut appeler.
+- **Serveur MCP** (`mcp/`) — `fetch_raw_answers` récupère les enregistrements bruts, et
+  `list_geo_skills` / `get_geo_skill` livrent les huit skills directement à tout agent compatible
+  MCP (Claude Code, Cursor, Codex), sans installation séparée (intégrées au MCP depuis 0.4.0).
 - **Skills** (`skills/`) — huit Agent Skills qui appellent cet outil, puis effectuent les calculs GEO
   en local : génération de prompts, visibilité, part de voix, citations, sentiment, concurrents,
   surveillance et un rapport complet.

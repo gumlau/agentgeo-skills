@@ -11,7 +11,7 @@
 <p>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
-  <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
+  <img src="https://img.shields.io/badge/MCP-3%20tools-5865F2.svg" alt="MCP: 3 tools">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
   <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
@@ -43,7 +43,7 @@
 
 あなたのコーディングエージェントは、このリポジトリ内の 2 つの要素を通じて AgentGEO に到達します。
 
-- **MCP サーバー**（`mcp/`）— `fetch_raw_answers` という限定的なツールを 1 つだけ公開し、MCP 互換の任意のエージェント（Claude Code、Cursor、Codex）から呼び出せます。
+- **MCP サーバー**（`mcp/`）— `fetch_raw_answers` が生レコードを取得し、`list_geo_skills` / `get_geo_skill` が 8 つのスキルを MCP 互換の任意のエージェント（Claude Code、Cursor、Codex）へ直接届けます。スキルの個別インストールは不要です（0.4.0 から MCP に内蔵）。
 - **スキル**（`skills/`）— そのツールを呼び出したうえで、GEO の計算をローカルで行う 8 つの Agent Skill です。プロンプト生成、可視性、シェア・オブ・ボイス、引用、センチメント、競合、モニタリング、そして完全なレポートを担います。
 
 ```mermaid

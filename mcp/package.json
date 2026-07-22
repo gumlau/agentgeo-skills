@@ -1,7 +1,8 @@
 {
   "name": "agentgeo-mcp",
-  "version": "0.3.1",
-  "description": "Zero-dependency MCP stdio server exposing one tool: fetch raw AI answer records (answer text, sources, provider metadata) from the AgentGEO API. No ranking, sentiment, or scoring.",
+  "version": "0.4.0",
+  "mcpName": "io.github.gumlau/agentgeo-mcp",
+  "description": "Zero-dependency MCP stdio server for AgentGEO: fetch raw AI answer records (answer text, sources, provider metadata) and load the eight built-in GEO analysis skills. All ranking, sentiment, and scoring runs agent-side.",
   "keywords": [
     "mcp",
     "model-context-protocol",
@@ -23,12 +24,14 @@
   },
   "files": [
     "index.mjs",
+    "skills.generated.mjs",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
     "check": "node --check index.mjs",
-    "test": "node --test test.mjs"
+    "test": "node --test test.mjs",
+    "prepublishOnly": "node index.mjs --version"
   },
   "engines": {
     "node": ">=18"

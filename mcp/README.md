@@ -1,13 +1,27 @@
 # agentgeo-mcp
 
-MCP stdio server for [AgentGEO](https://agentgeo.org). It exposes one
-deliberately narrow tool, `fetch_raw_answers`: fetch raw AI answer records
-(answer text, source citations, provider metadata) from ChatGPT, Perplexity,
-Gemini, Google AI Overview, Google AI Mode, and Copilot through AgentGEO's
-managed scrapers.
+MCP stdio server for [AgentGEO](https://agentgeo.org). Two jobs, one product
+boundary:
+
+- **`fetch_raw_answers`** — fetch raw AI answer records (answer text, source
+  citations, provider metadata) from ChatGPT, Perplexity, Gemini, Google AI
+  Overview, Google AI Mode, and Copilot through AgentGEO's managed scrapers.
+- **`list_geo_skills` / `get_geo_skill`** — deliver the eight built-in GEO
+  analysis skills (prompt-set, visibility, share-of-voice, citations,
+  sentiment, competitors, monitor, report) straight into any connected agent.
+  The same eight skills are also exposed through the MCP **prompts**
+  capability (Claude Code renders them as `/mcp__agentgeo__geo-report`-style slash
+  commands, with an optional `request` argument).
 
 It returns provider records unchanged — no rankings, sentiment, visibility
-scores, or conclusions. That analysis stays in your agent.
+scores, or conclusions. That analysis stays in your agent, guided by the
+built-in skills.
+
+Skill delivery is remote-first: the server reads the live copies from
+`GET /v1/skills` (so a worker deploy refreshes them, no npm release needed —
+and skill reads are free, they never spend credits), and falls back to the
+copies bundled in the tarball (`skills.generated.mjs`, regenerated with
+`node scripts/build-skill-bundle.mjs` after any SKILL.md change).
 
 Zero npm dependencies; Node.js 18+ built-ins only.
 

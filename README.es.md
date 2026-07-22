@@ -15,7 +15,7 @@ de forma local.
 <p>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
-  <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
+  <img src="https://img.shields.io/badge/MCP-3%20tools-5865F2.svg" alt="MCP: 3 tools">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
   <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
@@ -51,8 +51,9 @@ juicio de este repositorio lo calculan las skills, dentro de tu agente — nunca
 
 Tu agente de programación accede a AgentGEO mediante dos piezas de este repositorio:
 
-- **Servidor MCP** (`mcp/`) — expone una única herramienta acotada, `fetch_raw_answers`, que cualquier
-  agente compatible con MCP (Claude Code, Cursor, Codex) puede invocar.
+- **Servidor MCP** (`mcp/`) — `fetch_raw_answers` obtiene los registros en bruto, y `list_geo_skills` /
+  `get_geo_skill` entregan las ocho skills directamente a cualquier agente compatible con MCP
+  (Claude Code, Cursor, Codex), sin instalación aparte (integradas en el MCP desde 0.4.0).
 - **Skills** (`skills/`) — ocho Agent Skills que llaman a esa herramienta y luego hacen los cálculos de GEO
   localmente: generación de prompts, visibilidad, cuota de voz, citas, sentimiento, competidores,
   monitorización y un informe completo.

@@ -28,7 +28,26 @@ jobs:
       - name: Syntax check
         run: node --check index.mjs
 
-      - name: Publish to npm
-        run: npm publish --provenance --access public
+      # node --check does NOT resolve imports, and npm silently drops missing
+      # "files" entries — this is the gate that proves skills.generated.mjs
+      # made it into the tag (--version loads the module; no key needed).
+      - name: Module load gate (bundle present, imports resolve)
+        run: node index.mjs --version
+
+      - name: Run test suite
+        run: npm test
+
+      # Idempotent: the maintainer sometimes publishes from a local machine
+      # before cutting the Release (the 0.3.1 path). Skipping a version that
+      # is already live keeps that flow green instead of failing on E403.
+      - name: Publish to npm (skip if version already live)
+        run: |
+          local_version="$(node -p 'require("./package.json").version')"
+          live_version="$(npm view agentgeo-mcp version 2>/dev/null || echo none)"
+          if [ "$live_version" = "$local_version" ]; then
+            echo "agentgeo-mcp@$local_version already on npm — skipping publish"
+            exit 0
+          fi
+          npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

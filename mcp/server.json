@@ -1,0 +1,37 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.gumlau/agentgeo-mcp",
+  "description": "Fetch raw AI answers with citations from ChatGPT, Perplexity, Gemini, AI Overview, AI Mode, Copilot",
+  "version": "0.4.0",
+  "websiteUrl": "https://agentgeo.org",
+  "repository": {
+    "url": "https://github.com/gumlau/agentgeo-skills",
+    "source": "github",
+    "subfolder": "mcp"
+  },
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "agentgeo-mcp",
+      "version": "0.4.0",
+      "runtimeHint": "npx",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "AGENTGEO_API_KEY",
+          "description": "AgentGEO API key (ag_live_... for live data, ag_test_... for zero-credit demo mode). Create one at https://agentgeo.org under /app/keys.",
+          "isRequired": true,
+          "isSecret": true
+        },
+        {
+          "name": "AGENTGEO_API_URL",
+          "description": "AgentGEO API base URL. Defaults to https://api.agentgeo.org; self-hosters point it at their own server.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}

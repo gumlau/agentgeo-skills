@@ -3,16 +3,25 @@
 /**
  * AgentGEO MCP server (published to npm as `agentgeo-mcp`).
  *
- * It exposes one deliberately narrow tool: fetch raw AI answer records from
- * the AgentGEO REST API. It does not rank, score, summarize, or interpret
- * the provider response; that work stays in the calling agent.
+ * Two jobs, one product boundary:
+ *
+ *   - fetch_raw_answers — fetch raw AI answer records from the AgentGEO REST
+ *     API. It does not rank, score, summarize, or interpret the provider
+ *     response; that work stays in the calling agent.
+ *   - list_geo_skills / get_geo_skill (plus the same eight skills as MCP
+ *     prompts) — deliver the GEO analysis workflows the agent runs locally.
+ *     Served live from GET /v1/skills so they stay fresh without an npm
+ *     release, with the copies bundled at publish time
+ *     (skills.generated.mjs) as the offline fallback.
  *
  * Zero dependencies — Node.js built-ins only. Run via `npx -y agentgeo-mcp`
  * once published, or `node mcp/index.mjs` from a repo clone.
  */
 
+import { GEO_SKILLS } from "./skills.generated.mjs";
+
 /** Keep in lockstep with package.json "version". */
-const VERSION = "0.3.1";
+const VERSION = "0.4.0";
 
 /** Mirrors worker/src/routes/meta.ts: SUPPORTED_SURFACES (same keys, same order). */
 const SURFACES = [
@@ -33,7 +42,8 @@ function hasFlag(name) {
   return process.argv.includes(name);
 }
 
-const USAGE = `agentgeo-mcp ${VERSION} — MCP stdio server for raw AgentGEO answer records.
+const USAGE = `agentgeo-mcp ${VERSION} — MCP stdio server for raw AgentGEO answer records
+and the eight built-in GEO analysis skills.
 
 Usage:
   agentgeo-mcp --key ag_live_... [--api-url https://api.agentgeo.org]
@@ -190,6 +200,188 @@ const fetchTool = {
   },
 };
 
+// --- Built-in GEO skills -----------------------------------------------------
+//
+// The eight skills are the product's analysis layer: AgentGEO returns raw
+// records only, and each SKILL.md tells the agent exactly how to turn them
+// into visibility, share-of-voice, citation, sentiment, competitor, monitor
+// and report output. Delivering them through the server means every MCP
+// client gets the workflows with zero extra install. Live copies come from
+// GET /v1/skills (kept fresh by worker deploys; the authenticated read also
+// doubles as the console's agent-connected signal); the bundle from
+// skills.generated.mjs answers when the API is unreachable.
+
+const SKILL_NAMES = GEO_SKILLS.map((skill) => skill.name);
+
+/**
+ * Names are URL path segments and get an Authorization header attached —
+ * gate them to the skill-slug shape before any fetch so a crafted name can
+ * never traverse to a different endpoint.
+ */
+const SKILL_NAME_PATTERN = /^[a-z0-9][a-z0-9-]{0,63}$/;
+
+const SKILL_FETCH_TIMEOUT_MS = 10_000;
+
+/**
+ * Per-process cache. A resolved skill — live or bundled — is stable for the
+ * life of one MCP session; the bundled copy is at most one npm release stale,
+ * so a session that started during an API outage keeps the fallback instead
+ * of paying a fresh timeout on every later call. Unknown-name misses are NOT
+ * cached, so a catalog-only skill can be retried once the API is reachable.
+ */
+const skillCache = new Map();
+
+async function loadSkill(name) {
+  if (skillCache.has(name)) return skillCache.get(name);
+  const bundled = GEO_SKILLS.find((skill) => skill.name === name);
+  // Bundled names never fail; names the bundle doesn't know (a skill added by
+  // a worker deploy after this npm release) resolve only when the API serves
+  // them — that keeps list_geo_skills' live catalog and get_geo_skill in
+  // agreement instead of advertising names the enum-era code would reject.
+  let resolved = bundled ?? null;
+  try {
+    const response = await fetch(`${apiUrl}/v1/skills/${encodeURIComponent(name)}`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      signal: AbortSignal.timeout(SKILL_FETCH_TIMEOUT_MS),
+    });
+    if (response.ok) {
+      const payload = JSON.parse(await response.text());
+      if (payload && typeof payload.content === "string" && payload.content.trim()) {
+        resolved = {
+          name,
+          description: typeof payload.description === "string" ? payload.description : (bundled?.description ?? ""),
+          version: typeof payload.version === "string" ? payload.version : (bundled?.version ?? ""),
+          content: payload.content,
+        };
+      }
+    }
+  } catch {
+    // Unreachable API — the bundled copy (when one exists) is the answer.
+  }
+  if (resolved) skillCache.set(name, resolved);
+  return resolved;
+}
+
+const listSkillsTool = {
+  name: "list_geo_skills",
+  title: "List built-in GEO skills",
+  description:
+    "List the eight GEO analysis skills built into this server, in recommended pipeline order. Call this FIRST for any GEO analysis ask — visibility, share of voice, citations, sentiment, competitor comparison, monitoring, or a full report — then load the matching workflow with get_geo_skill. Free: contacts no AI provider and spends no credits.",
+  inputSchema: { type: "object", additionalProperties: false, properties: {} },
+};
+
+const getSkillTool = {
+  name: "get_geo_skill",
+  title: "Get a built-in GEO skill",
+  description:
+    "Return the full SKILL.md workflow for one GEO skill by name (use the names list_geo_skills returns; the built-in eight are geo-prompt-set, geo-visibility, geo-share-of-voice, geo-citations, geo-sentiment, geo-competitors, geo-monitor, geo-report). Follow it step by step: skills consume fetch_raw_answers output and run every ranking, scoring and reporting step locally in the agent — AgentGEO itself only ever returns raw answers. Free: contacts no AI provider and spends no credits.",
+  inputSchema: {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      name: {
+        // Deliberately NOT an enum of the bundled names: the live catalog can
+        // grow via a worker deploy, and this npm artifact must keep serving
+        // whatever list_geo_skills advertises.
+        type: "string",
+        pattern: "^[a-z0-9][a-z0-9-]{0,63}$",
+        description: 'Skill to load, e.g. "geo-visibility". Take names from list_geo_skills.',
+      },
+    },
+    required: ["name"],
+  },
+};
+
+/** One-line map of how the eight skills chain, shown by list_geo_skills. */
+const SKILL_PIPELINE =
+  "geo-prompt-set builds the prompt library every other skill consumes; " +
+  "geo-visibility, geo-share-of-voice, geo-citations and geo-sentiment each analyze one dimension; " +
+  "geo-competitors joins them into one comparison; geo-monitor tracks runs over time; " +
+  "geo-report synthesizes everything into an executive report.";
+
+async function callListSkills(id) {
+  // Remote-first so a redeployed worker can update the catalog without an npm
+  // release. Any failure falls through to the bundled index — listing skills
+  // must never be the step that breaks.
+  let skills;
+  try {
+    const response = await fetch(`${apiUrl}/v1/skills`, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+      signal: AbortSignal.timeout(SKILL_FETCH_TIMEOUT_MS),
+    });
+    if (response.ok) {
+      const payload = JSON.parse(await response.text());
+      if (Array.isArray(payload?.skills) && payload.skills.length > 0) {
+        const remote = payload.skills
+          .filter((skill) => skill && typeof skill.name === "string")
+          .map(({ name, description, version }) => ({ name, description, version }));
+        if (remote.length > 0) skills = remote;
+      }
+    }
+  } catch {
+    // Unreachable API — fall through to the bundle.
+  }
+  if (!skills) {
+    skills = GEO_SKILLS.map(({ name, description, version }) => ({ name, description, version }));
+  }
+  const payload = {
+    object: "skill_list",
+    count: skills.length,
+    pipeline: SKILL_PIPELINE,
+    next_step: "Call get_geo_skill with a name below, then follow the returned workflow.",
+    skills,
+  };
+  result(id, {
+    content: [{ type: "text", text: JSON.stringify(payload, null, 2) }],
+    structuredContent: payload,
+  });
+}
+
+async function callGetSkill(id, args) {
+  const name = typeof args?.name === "string" ? args.name.trim() : "";
+  if (!SKILL_NAME_PATTERN.test(name)) {
+    error(id, -32602, "Invalid get_geo_skill arguments", {
+      known_skills: SKILL_NAMES,
+      requested: name || null,
+    });
+    return;
+  }
+  const skill = await loadSkill(name);
+  if (!skill) {
+    error(id, -32602, "Unknown skill", {
+      known_skills: SKILL_NAMES,
+      requested: name,
+      note: "Names outside the bundled eight resolve only when the AgentGEO API serves them (list_geo_skills shows the live catalog).",
+    });
+    return;
+  }
+  result(id, { content: [{ type: "text", text: skill.content }] });
+}
+
+/**
+ * The same eight skills through the MCP prompts capability. Clients with
+ * prompt UI (Claude Code renders these as /mcp__agentgeo__* slash commands)
+ * get one-keystroke access; clients without it lose nothing — the tools
+ * above deliver identical content.
+ */
+function promptEntry(skill) {
+  // First sentence only: prompt pickers render one line, and each
+  // description's "Use when…" tail is trigger phrasing for skill routers,
+  // not for humans.
+  const summary = skill.description.split(" Use when")[0];
+  return {
+    name: skill.name,
+    description: summary,
+    arguments: [
+      {
+        name: "request",
+        description: "Brand or site, competitors, surfaces — anything specific this run should analyze.",
+        required: false,
+      },
+    ],
+  };
+}
+
 async function callFetchTool(id, args) {
   const query = typeof args?.query === "string" ? args.query.trim() : "";
   const surfaces = Array.isArray(args?.surfaces) ? args.surfaces : [];
@@ -274,25 +466,50 @@ async function handle(message) {
     case "initialize":
       result(message.id, {
         protocolVersion: message.params?.protocolVersion || "2025-06-18",
-        capabilities: { tools: { listChanged: false } },
+        capabilities: { tools: { listChanged: false }, prompts: { listChanged: false } },
         serverInfo: { name: "agentgeo-mcp", version: VERSION },
         instructions:
-          "Use fetch_raw_answers to retrieve raw provider records. Perform ranking, sentiment, comparisons, and reporting locally in the agent.",
+          "AgentGEO returns raw AI answers only; every analysis runs locally in this agent, guided by eight built-in GEO skills. For any GEO analysis ask (visibility, share of voice, citations, sentiment, competitors, monitoring, report), call list_geo_skills FIRST, then get_geo_skill for the matching workflow and follow it. fetch_raw_answers retrieves the raw provider records the skills consume.",
       });
       break;
     case "ping":
       result(message.id, {});
       break;
     case "tools/list":
-      result(message.id, { tools: [fetchTool] });
+      result(message.id, { tools: [listSkillsTool, getSkillTool, fetchTool] });
       break;
-    case "tools/call":
-      if (message.params?.name !== fetchTool.name) {
-        error(message.id, -32602, `Unknown tool: ${message.params?.name || "(missing)"}`);
-        return;
+    case "tools/call": {
+      const toolName = message.params?.name;
+      const toolArgs = message.params?.arguments || {};
+      if (toolName === fetchTool.name) await callFetchTool(message.id, toolArgs);
+      else if (toolName === listSkillsTool.name) await callListSkills(message.id);
+      else if (toolName === getSkillTool.name) await callGetSkill(message.id, toolArgs);
+      else error(message.id, -32602, `Unknown tool: ${toolName || "(missing)"}`);
+      break;
+    }
+    case "prompts/list":
+      result(message.id, { prompts: GEO_SKILLS.map(promptEntry) });
+      break;
+    case "prompts/get": {
+      const promptName = message.params?.name;
+      if (typeof promptName !== "string" || !SKILL_NAMES.includes(promptName)) {
+        error(message.id, -32602, `Unknown prompt: ${promptName || "(missing)"}`, {
+          known_prompts: SKILL_NAMES,
+        });
+        break;
       }
-      await callFetchTool(message.id, message.params.arguments || {});
+      const skill = await loadSkill(promptName);
+      const request = message.params?.arguments?.request;
+      const text =
+        typeof request === "string" && request.trim()
+          ? `${skill.content}\n\n---\n\nUser request: ${request.trim()}`
+          : skill.content;
+      result(message.id, {
+        description: promptEntry(skill).description,
+        messages: [{ role: "user", content: { type: "text", text } }],
+      });
       break;
+    }
     default:
       error(message.id, -32601, `Method not found: ${message.method}`);
   }

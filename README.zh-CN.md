@@ -14,7 +14,7 @@
 <p>
   <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-orange.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/skills-8-blue.svg" alt="8 skills">
-  <img src="https://img.shields.io/badge/MCP-1%20tool-5865F2.svg" alt="MCP: 1 tool">
+  <img src="https://img.shields.io/badge/MCP-3%20tools-5865F2.svg" alt="MCP: 3 tools">
   <img src="https://img.shields.io/badge/deps-0-brightgreen.svg" alt="Zero dependencies">
   <a href="https://agentgeo.org"><img src="https://img.shields.io/badge/Powered%20by-AgentGEO-181818.svg" alt="Powered by AgentGEO"></a>
 </p>
@@ -50,8 +50,9 @@
 
 你的编码 agent 通过本仓库的两个部分接入 AgentGEO:
 
-- **MCP 服务器**(`mcp/`)—— 暴露一个职责单一的工具 `fetch_raw_answers`,任何兼容 MCP 的
-  agent(Claude Code、Cursor、Codex)都能调用。
+- **MCP 服务器**（`mcp/`）—— `fetch_raw_answers` 拉取原始记录，`list_geo_skills` /
+  `get_geo_skill` 把下面八个 skill 直接送进任何兼容 MCP 的 agent（Claude Code、Cursor、
+  Codex）——无需单独安装 skill（0.4.0 起内置于 MCP）。
 - **Skills**(`skills/`)—— 八个 Agent Skill,调用该工具后在本地完成 GEO 计算:prompt 生成、
   可见度、声量占比、引用、情感、竞品、监控,以及一份完整报告。
 
