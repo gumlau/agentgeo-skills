@@ -95,7 +95,10 @@ Request arguments:
 
 Requests wait up to 180 seconds — live surfaces are slow (an AI Overview SERP
 round-trip runs 40–90s; chatbot dataset scrapes can exceed the API's sync
-budget entirely, which is what `snapshot_id` redemption is for).
+budget entirely, which is what `snapshot_id` redemption is for). Calls are
+handled **concurrently**: for a multi-prompt run, issue every prompt's fetch
+as one parallel batch of tool calls and the whole run takes roughly one fetch
+duration instead of one per prompt.
 
 Each per-surface record in `answers` carries `surfaceKey`, `status`
 (`delivered` or `failed`), `answerText`, `sources` (title / url / position),

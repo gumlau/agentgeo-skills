@@ -59,7 +59,7 @@ Brand detection matches a normalized alias set, not raw string equality. Build t
 
 ### 2.1 Preferred method — MCP tool `fetch_raw_answers`
 
-Call once per prompt, repeated `{runsPerPrompt}` times, using the prompt's own `surfaces`. Example arguments:
+Call once per prompt, repeated `{runsPerPrompt}` times, using the prompt's own `surfaces`. **Run all prompt fetches in PARALLEL** — issue every `fetch_raw_answers` call for the run as ONE concurrent batch of tool calls, not sequential waves; the server and API execute them simultaneously, so a 12-prompt run takes one fetch duration, not twelve. Example arguments:
 
 ```json
 {

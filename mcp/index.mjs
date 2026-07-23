@@ -21,7 +21,7 @@
 import { GEO_SKILLS } from "./skills.generated.mjs";
 
 /** Keep in lockstep with package.json "version". */
-const VERSION = "0.4.0";
+const VERSION = "0.4.1";
 
 /** Mirrors worker/src/routes/meta.ts: SUPPORTED_SURFACES (same keys, same order). */
 const SURFACES = [
@@ -169,7 +169,7 @@ const fetchTool = {
   name: "fetch_raw_answers",
   title: "Fetch raw AI answers",
   description:
-    "Fetch raw answer text, citations, and provider metadata through AgentGEO's managed AI scrapers. Returns no ranking, sentiment, visibility score, or other analysis.",
+    "Fetch raw answer text, citations, and provider metadata through AgentGEO's managed AI scrapers. Returns no ranking, sentiment, visibility score, or other analysis. Safe to call in parallel: for a multi-prompt run, issue ALL prompt fetches as one concurrent batch of tool calls (do not split into sequential waves) — the server and API handle them simultaneously. If a record fails with providerFields.snapshot_id, redeem it (same single surface + snapshot_id) instead of re-fetching.",
   inputSchema: {
     type: "object",
     additionalProperties: false,
@@ -223,16 +223,37 @@ const SKILL_NAME_PATTERN = /^[a-z0-9][a-z0-9-]{0,63}$/;
 const SKILL_FETCH_TIMEOUT_MS = 10_000;
 
 /**
- * Per-process cache. A resolved skill — live or bundled — is stable for the
- * life of one MCP session; the bundled copy is at most one npm release stale,
- * so a session that started during an API outage keeps the fallback instead
- * of paying a fresh timeout on every later call. Unknown-name misses are NOT
- * cached, so a catalog-only skill can be retried once the API is reachable.
+ * Per-process cache, keyed by skill name -> the SINGLE in-flight (or settled)
+ * resolution promise. Caching the promise rather than the resolved value makes
+ * loadSkill single-flight: concurrent get_geo_skill / prompts/get calls for the
+ * same name share ONE authenticated fetch and ONE result. That matters now that
+ * requests dispatch concurrently — with the old serial queue two loadSkill calls
+ * never overlapped, but under concurrency a naive check-then-act cache let the
+ * slowest caller (a 10s-timed-out fetch that falls back to the bundled copy)
+ * overwrite a live copy a faster caller had already cached, pinning the stale
+ * bundled content for the rest of the session. A resolved skill — live or
+ * bundled — is stable for the life of one MCP session; the bundled fallback is
+ * thus cached at most one npm release stale instead of re-timing-out on every
+ * later call. Unknown-name misses are NOT cached (the entry is deleted on a null
+ * result), so a catalog-only skill can be retried once the API is reachable.
  */
 const skillCache = new Map();
 
-async function loadSkill(name) {
-  if (skillCache.has(name)) return skillCache.get(name);
+function loadSkill(name) {
+  const inflight = skillCache.get(name);
+  if (inflight !== undefined) return inflight;
+  const promise = resolveSkill(name).then((resolved) => {
+    // Don't pin an unknown-name miss: drop it so a later call can retry once a
+    // worker deploy makes the API serve it. Bundled names always resolve, so
+    // only catalog-only misses take this branch.
+    if (!resolved) skillCache.delete(name);
+    return resolved;
+  });
+  skillCache.set(name, promise);
+  return promise;
+}
+
+async function resolveSkill(name) {
   const bundled = GEO_SKILLS.find((skill) => skill.name === name);
   // Bundled names never fail; names the bundle doesn't know (a skill added by
   // a worker deploy after this npm release) resolve only when the API serves
@@ -258,7 +279,6 @@ async function loadSkill(name) {
   } catch {
     // Unreachable API — the bundled copy (when one exists) is the answer.
   }
-  if (resolved) skillCache.set(name, resolved);
   return resolved;
 }
 
@@ -517,7 +537,6 @@ async function handle(message) {
 
 process.stdin.setEncoding("utf8");
 let buffer = "";
-let queue = Promise.resolve();
 
 process.stdin.on("data", (chunk) => {
   buffer += chunk;
@@ -525,12 +544,30 @@ process.stdin.on("data", (chunk) => {
   buffer = lines.pop() || "";
   for (const line of lines) {
     if (!line.trim()) continue;
-    queue = queue.then(async () => {
-      try {
-        await handle(JSON.parse(line));
-      } catch (cause) {
-        error(null, -32700, "Parse error", cause instanceof Error ? cause.message : String(cause));
-      }
+    let message;
+    try {
+      message = JSON.parse(line);
+    } catch (cause) {
+      error(null, -32700, "Parse error", cause instanceof Error ? cause.message : String(cause));
+      continue;
+    }
+    // Dispatch WITHOUT awaiting. Requests used to chain onto one global
+    // promise queue, which serialized every tools/call: one live fetch runs
+    // 30-150s, so a client fanning out N prompt fetches in parallel got them
+    // executed strictly one-after-another — an N-prompt audit took N fetch
+    // durations, and queued calls blew past the client's per-request timeout
+    // while the worker was never even contacted. JSON-RPC responses carry the
+    // request id and may arrive in any order; each write() below emits one
+    // complete line atomically, so concurrent handlers cannot interleave
+    // output. handle() resolves errors internally — this catch is the
+    // last-resort guard for unexpected throws.
+    void handle(message).catch((cause) => {
+      error(
+        message?.id ?? null,
+        -32603,
+        "Internal error",
+        cause instanceof Error ? cause.message : String(cause),
+      );
     });
   }
 });

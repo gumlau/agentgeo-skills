@@ -48,6 +48,11 @@ delete cleanEnv.AGENTGEO_API_URL;
 let mock;
 let mockUrl;
 
+// Counts upstream fetches for the geo-singleflight skill name (used ONLY by the
+// single-flight regression test), so that test can assert concurrent same-name
+// loads collapse to one upstream call.
+let singleflightFetches = 0;
+
 before(async () => {
   mock = createServer((req, res) => {
     let raw = "";
@@ -96,6 +101,30 @@ before(async () => {
             description: "catalog-only skill",
             version: "1.0.0",
             content: "# NINTH workflow",
+          }),
+        );
+        return;
+      }
+      if (req.method === "GET" && req.url === "/__singleflight_count") {
+        // Out-of-band read of the geo-singleflight fetch counter. Named outside
+        // the /v1/skills/ namespace so it can never be mistaken for a skill.
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ count: singleflightFetches }));
+        return;
+      }
+      if (req.method === "GET" && req.url === "/v1/skills/geo-singleflight") {
+        // A live-only skill (no bundled copy) whose every fetch is counted.
+        // Single-flight means N concurrent get_geo_skill("geo-singleflight")
+        // calls in one session increment this exactly once.
+        singleflightFetches += 1;
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(
+          JSON.stringify({
+            object: "skill",
+            name: "geo-singleflight",
+            description: "single-flight probe",
+            version: "1.0.0",
+            content: "# SINGLEFLIGHT live workflow",
           }),
         );
         return;
@@ -407,6 +436,31 @@ test("AGENTGEO_TIMEOUT_MS bounds the fetch: a slow response becomes a tool error
   assert.equal(res.isError, true, "a fetch exceeding the timeout must be a tool error");
 });
 
+// Regression: requests used to chain onto one global promise queue, so a slow
+// fetch head-of-line blocked every request behind it — a client fanning out N
+// prompt fetches got them executed strictly sequentially (N × fetch duration),
+// and queued calls timed out client-side before the API was even contacted.
+// Concurrent dispatch means the fast fetch's response must land while the slow
+// one (2s mock delay) is still in flight. Map preserves insertion order, so
+// the order of rpcSession's keys IS the arrival order.
+test("tools/call requests run concurrently: a slow fetch does not block a fast one", async () => {
+  const byId = await rpcSession(
+    [
+      callFetch(26, { query: "slow", surfaces: ["chatgpt"] }),
+      callFetch(27, { query: "ok", surfaces: ["chatgpt"] }),
+    ],
+    { args: ["--key", "ag_test_dummy", "--api-url", mockUrl] },
+  );
+  assert.ok(!byId.get(26).result.isError, "slow fetch must still succeed");
+  assert.ok(!byId.get(27).result.isError, "fast fetch must succeed");
+  const arrival = [...byId.keys()];
+  assert.deepEqual(
+    arrival,
+    [27, 26],
+    "the fast fetch's response must arrive before the slow fetch's (no head-of-line blocking)",
+  );
+});
+
 test("an invalid AGENTGEO_TIMEOUT_MS falls back to the default (fetch still succeeds)", async () => {
   const byId = await rpcSession([callFetch(25, { query: "ok", surfaces: ["chatgpt"] })], {
     args: ["--key", "ag_test_dummy", "--api-url", mockUrl],
@@ -526,6 +580,26 @@ test("get_geo_skill serves a catalog-only skill the bundle doesn't know", async 
   const res = byId.get(35).result;
   assert.ok(!res.isError, "a live-catalog skill must resolve even without a bundled copy");
   assert.equal(res.content[0].text, "# NINTH workflow");
+});
+
+// Regression: concurrent request dispatch (the parallel-fetch fix) exposed a
+// check-then-act race in the skill cache — two get_geo_skill calls for the same
+// name each fired their own authenticated fetch, and a slow one falling back to
+// the bundle could overwrite a live copy a fast one had cached. Single-flight
+// caching (one shared in-flight promise per name) collapses concurrent same-name
+// loads to ONE upstream fetch. The mock counts fetches for this probe name.
+test("get_geo_skill is single-flight: concurrent same-name loads share one upstream fetch", async () => {
+  const byId = await rpcSession(
+    [
+      callTool(45, "get_geo_skill", { name: "geo-singleflight" }),
+      callTool(46, "get_geo_skill", { name: "geo-singleflight" }),
+    ],
+    { args: ["--key", "ag_test_dummy", "--api-url", mockUrl] },
+  );
+  assert.equal(byId.get(45).result.content[0].text, "# SINGLEFLIGHT live workflow");
+  assert.equal(byId.get(46).result.content[0].text, "# SINGLEFLIGHT live workflow");
+  const { count } = await fetch(`${mockUrl}/__singleflight_count`).then((r) => r.json());
+  assert.equal(count, 1, "two concurrent same-name loads must issue exactly one upstream fetch");
 });
 
 test("get_geo_skill rejects an unknown skill name when the API misses too", async () => {

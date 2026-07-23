@@ -6,6 +6,28 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.1] — 2026-07-23
+
+### Fixed
+
+- **MCP**: JSON-RPC requests are now dispatched **concurrently** instead of
+  through one global serialized queue. Previously a client fanning out N
+  `fetch_raw_answers` calls had them executed strictly one-after-another
+  (~N × fetch duration for a multi-prompt audit), and queued calls could blow
+  past the client's per-request timeout before the API was even contacted.
+  Responses carry their request id and may arrive in any order, per JSON-RPC.
+
+### Changed
+
+- **MCP**: `fetch_raw_answers` description now states parallel-safety (issue
+  all prompt fetches as one concurrent batch) and the `snapshot_id` redemption
+  rule, so agents stop re-paying for scrapes that merely outlived the sync
+  budget.
+- **Skills**: the six fetch-phase skills (`geo-visibility`,
+  `geo-share-of-voice`, `geo-citations`, `geo-sentiment`, `geo-competitors`,
+  `geo-report`) now instruct agents to run all prompt fetches in parallel
+  rather than sequential waves.
+
 ## [0.4.0] — 2026-07-22
 
 The eight GEO skills are now **built into the MCP server** — any connected

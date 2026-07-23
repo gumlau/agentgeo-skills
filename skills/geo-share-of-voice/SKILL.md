@@ -57,7 +57,7 @@ Brand mentions must be matched on a normalized alias set, not raw string equalit
 
 ### 2.1 Preferred method — MCP tool `fetch_raw_answers`
 
-Call once per prompt (repeat `{runsPerPrompt}` times). Example arguments:
+Call once per prompt (repeat `{runsPerPrompt}` times). **Run all prompt fetches in PARALLEL** — issue every `fetch_raw_answers` call for the run as ONE concurrent batch of tool calls, not sequential waves; the server and API execute them simultaneously, so a 12-prompt run takes one fetch duration, not twelve. Example arguments:
 
 ```json
 {
