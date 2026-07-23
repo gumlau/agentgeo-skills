@@ -1,7 +1,7 @@
 ---
 name: geo-report
-description: Synthesize a full GEO audit report from AgentGEO raw answers — an answer-first executive verdict, an engine × buyer-intent visibility matrix, a decomposed per-dimension scorecard (visibility, share-of-voice, citations, sentiment) with published banding, a quantified competitor benchmark, per-threat evidence cards, a priority-scored fix plan, trend deltas vs a prior run, and a quarantined evidence registry — every score, rank, and fix computed agent-side and backed by a verbatim quote or cited URL. Optionally also renders a self-contained HTML scorecard. Use when the user asks for a GEO report, full AI-visibility report, generative engine optimization report, executive GEO summary, "how do we show up in AI and what do we fix", a GEO audit across ChatGPT/Perplexity/Gemini/Copilot/Google, a prioritized GEO action plan, a client-ready or shareable GEO deliverable, or "put it all together into one report".
-version: 0.2.0
+description: Synthesize a full GEO audit report from AgentGEO raw answers — an answer-first executive verdict, an engine × buyer-intent visibility matrix, a decomposed per-dimension scorecard (visibility, share-of-voice, citations, sentiment) with published banding, a quantified competitor benchmark, per-threat evidence cards, a priority-scored fix plan, trend deltas vs a prior run, and a quarantined evidence registry — every score, rank, and fix computed agent-side and backed by a verbatim quote or cited URL. Saves the deliverable as local files when the agent can write to disk — a markdown report, an optional self-contained HTML scorecard, and a multi-sheet xlsx workbook (mention-rate and citation-rate pivots plus a raw detail log). Use when the user asks for a GEO report, full AI-visibility report, generative engine optimization report, executive GEO summary, "how do we show up in AI and what do we fix", a GEO audit across ChatGPT/Perplexity/Gemini/Copilot/Google, a prioritized GEO action plan, a client-ready or shareable GEO deliverable, or "put it all together into one report".
+version: 0.3.0
 ---
 
 # geo-report Skill
@@ -326,6 +326,30 @@ Library-free visualizations — map each to its section, and keep **chart-type d
 
 Cross-cutting viz discipline: data marks use one categorical 4-color palette; all text/axes/gridlines use `currentColor` on an opacity ladder (labels .8 / subtitles .45 / gridlines .08); **every rendered mark must equal its value in the meta block** (self-check). Load the design guidance for the artifact host before authoring the HTML if one is available.
 
+### Save the deliverables to local files (when the agent can write to disk)
+
+If the running environment can write files (Claude Code, Cursor, an IDE agent, or any client with file/code-execution tools), do NOT only print the report in chat — **also save it to disk**, the way an analyst expects a deliverable to land. Name files `{brand}-geo-{artifact}-{YYYY-MM-DD}` and tell the user the paths afterward.
+
+| File | Contents | How |
+|------|----------|-----|
+| `…-report.md` | the full markdown report (§0–§10) | write the markdown verbatim |
+| `…-scorecard.html` | the self-contained HTML scorecard (§5), when one was emitted | write the HTML |
+| `…-data.xlsx` | the structured workbook (below) | `openpyxl`, or the `xlsx` skill; fall back to one **CSV per sheet** if no spreadsheet library is available; fall back to markdown tables only if there are no file tools at all |
+
+The workbook is the engineer-facing **pivots-plus-raw** shape analysts expect — the pivots summarize, the detail log is the audit trail:
+
+| Sheet | Shape |
+|-------|-------|
+| `About` | brand, competitors, engines, prompts × runs, mode, non-attribution note; if `mode == demo`, a bold **DEMO** banner as row 1 |
+| `Scorecard` | the four dimensions + composite: score, grade, confidence, sub-signal breakdown |
+| `Mention Rate` | pivot — rows = prompts (+ a brand summary row) with an Intent column, columns = the six engines, cell = `hits / runs · %`; an unconfigured engine renders `n/c`, never `0` |
+| `Citation Rate` | the same pivot for owned-domain (`{brand}` domains) citations |
+| `Share of Voice` | rows = engines, columns = `{brand}` + each competitor + Others, cell = `%` |
+| `Sentiment` | rows = engines (or prompts), columns = positive / neutral / negative share |
+| `Detail Log` | **one row per raw answer** — brand, prompt, intent, engine, timestamp, region, mentioned, cited_own_domain, cited_url, model, answer_excerpt. This is where `fetch_raw_answers` records land verbatim |
+
+Report language defaults to **English** (international audience) unless the user asks for another; localize the prompt phrasing via geo-prompt-set, not the report chrome. Same discipline as everywhere: for `demo` data, label every file `DEMO` and never present a fixture as a measurement; never write a number, quote, domain, or cell not backed by a delivered record.
+
 ## Phase 6: Self-Critique QA Gate (run before delivering)
 
 Fail and fix before emitting if any check fails:
@@ -340,7 +364,7 @@ Fail and fix before emitting if any check fails:
 
 ## Phase 7: Output
 
-Emit the markdown report in the §0–§10 order (PULSE: §0,1,3 + crowned action). Then the machine-readable blocks.
+Emit the markdown report in the §0–§10 order (PULSE: §0,1,3 + crowned action). Then the machine-readable blocks. **If the agent can write files, also save the deliverables to disk per Phase 5** (the `.md` report, the optional `.html` scorecard, and the `.xlsx` workbook) rather than only printing them in chat, and report the paths.
 
 ### 7.1 Machine-readable handoff block (REQUIRED, unchanged)
 
@@ -349,7 +373,7 @@ Append this HTML comment at the end of every report. **geo-monitor** parses it t
 ```
 <!-- GEO-REPORT-META
 skill: geo-report
-version: 0.2.0
+version: 0.3.0
 mode: {live|demo}
 date: {YYYY-MM-DD}
 brand: {brand}
@@ -374,7 +398,7 @@ For richer downstream tooling (dashboards, deltas), optionally append this SECON
 
 ```
 <!-- GEO-REPORT-META-EXT
-scoring_model: geo-report@0.2.0
+scoring_model: geo-report@0.3.0
 depth: {PULSE|FULL}
 confidence_overall: {High|Med|Low}
 runs_per_prompt: {r}
