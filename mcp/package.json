@@ -1,6 +1,6 @@
 {
   "name": "agentgeo-mcp",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "mcpName": "io.github.gumlau/agentgeo-mcp",
   "description": "Zero-dependency MCP stdio server for AgentGEO: fetch raw AI answer records (answer text, sources, provider metadata) and load the eight built-in GEO analysis skills. All ranking, sentiment, and scoring runs agent-side.",
   "keywords": [

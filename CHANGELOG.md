@@ -6,6 +6,19 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.4.2] — 2026-07-23
+
+### Changed
+
+- **geo-report v0.3.0**: the report is now a landed deliverable. When the agent
+  can write files, it saves a markdown report, an optional self-contained HTML
+  scorecard, and a multi-sheet **xlsx workbook** (About, Scorecard, Mention Rate
+  and Citation Rate pivots, Share of Voice, Sentiment, and a Detail Log with one
+  row per raw `fetch_raw_answers` record), falling back to CSV-per-sheet then
+  markdown tables. Report language defaults to English. This release syncs that
+  skill body into the bundled offline copy; it already served live via
+  `GET /v1/skills`. No MCP protocol change.
+
 ## [0.4.1] — 2026-07-23
 
 ### Fixed
